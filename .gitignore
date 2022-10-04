@@ -23,6 +23,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 Data/
+src/c__Advanced/Tracking/model_data
+src/c__Advanced/Face_Recognition/apps/Secure_Access/models
 build/
 develop-eggs/
 dist/
@@ -44,7 +46,7 @@ MANIFEST
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
-*.spec
+#*.spec # We require .spec configuration for the record
 
 # Installer logs
 pip-log.txt
