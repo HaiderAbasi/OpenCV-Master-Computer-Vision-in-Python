@@ -599,7 +599,7 @@ def get_data(topic, type = "img", folder_dir = None):
     return data_dirs,filenames
 
 
-## Secure Access
+## Secure Access APP
 
 def get_iou(bb1, bb2):
     """
@@ -669,8 +669,7 @@ def to_ltrd(rect,rect_format ="bbox"):
     elif rect_format =="css":
         (top, right, down, left) = rect
         return ((left,top,right,down))
-    
-    
+ 
 def to_trbl(ltwh,scale=1):
     #  __ _ _ _ _ _  X axis
     # |     x1  y1
@@ -715,8 +714,7 @@ def to_ltwh(rect,rect_format ="corners"):
     height = abs(bottom - top) 
     return ((left,top,width,height))        
 
-## Secure Access
-
+## Secure Access APP
 
 # Advanced
 

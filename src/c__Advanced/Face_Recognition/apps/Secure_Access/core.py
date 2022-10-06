@@ -1,3 +1,4 @@
+from ast import arg
 import cv2
 import numpy as np
 from math import ceil
@@ -16,22 +17,27 @@ from multiprocessing import active_children
 import sys
 from os import path
 
+import argparse
+
+
 import face_recognition
 # Reference (Cross-Platform-Path) = https://stackoverflow.com/questions/122455/handling-file-paths-cross-platform
+import config
+
+import subprocess
+
 
 class secure_access_cv:
 
     def __init__(self):
-        self.face_detector = "hog"
-        
+                
         # [1: Face Detector] Loading cascade classifier as the fastest face detector in OpenCV
-        cascPathface = r"models\haarcascade_frontalface_alt_tree.xml"
         self.faceCascade = cv2.CascadeClassifier()
-        if not self.faceCascade.load(path.join(path.dirname(__file__),cascPathface)):
-            print(f'--(!)Error loading face cascade from {cascPathface}')
+        if not self.faceCascade.load(path.join(path.dirname(__file__),config.cascPathface)):
+            print(f'--(!)Error loading face cascade from {config.cascPathface}')
             sys.exit(0)
         # [2: Object Tracker] Loading MultiTracker class for multiple face tracking after detectionh
-        self.m_tracker = multitracker("MOSSE")
+        self.m_tracker = multitracker(config.tracker_type)
         # [3: Recognition] Loading Face Recognition performing recogntion on detected faces
         self.face_recog = face_recognition_dlib()
         # [4: Profiling] Creating deque object to act as a running average filter for a smoothed FPS estimation
@@ -52,16 +58,17 @@ class secure_access_cv:
         else: # Already too slow --> Wait for minimum possible time
             waitTime = 1
         
-        elapsed_time_sec = (self.elapsed_time)/1000
-        fps = 1.0 / elapsed_time_sec if elapsed_time_sec!=0 else 100.00
-        # Rolling average applied to get average fps estimation
-        self.fps_queue.append(fps)
-        fps = (sum(self.fps_queue)/len(self.fps_queue))
-        #fps_txt = f"{self.tracker.mode}: ( {self.tracker.tracker_type} ) at {fps:.2f} FPS"
-        fps_txt = f"Secure Access (CV) at {fps:.2f} FPS"
-        cv2.putText(frame, fps_txt ,(20,40) ,cv2.FONT_HERSHEY_DUPLEX, 1, (255,0,0))
-        cv2.putText(frame, f"Computed WaitTime = {waitTime}" ,(20,80) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0))
-        cv2.putText(frame, f"Detector = {self.face_detector}, Mode = {self.m_tracker.mode}" ,(20,160) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0))
+        if config.display_state:
+            elapsed_time_sec = (self.elapsed_time)/1000
+            fps = 1.0 / elapsed_time_sec if elapsed_time_sec!=0 else 100.00
+            # Rolling average applied to get average fps estimation
+            self.fps_queue.append(fps)
+            fps = (sum(self.fps_queue)/len(self.fps_queue))
+            #fps_txt = f"{self.tracker.mode}: ( {self.tracker.tracker_type} ) at {fps:.2f} FPS"
+            fps_txt = f"Secure Access (CV) at {fps:.2f} FPS"
+            cv2.putText(frame, fps_txt ,(20,40) ,cv2.FONT_HERSHEY_DUPLEX, 1, (255,0,0))
+            cv2.putText(frame, f"Computed WaitTime = {waitTime}" ,(20,80) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0))
+            cv2.putText(frame, f"Detector = {config.face_detector}, Mode = {self.m_tracker.mode}" ,(20,160) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0))
 
         return waitTime
 
@@ -102,12 +109,12 @@ class secure_access_cv:
 
     def activate_sa(self,vid_id,dataset_dir =""):
         print("Activating Secure Access....\n Authorized personnel only!")
-
+        config.vid_id = vid_id
+        
         # Get embeddings [encodings + Names]
         data = self.face_recog.get_embeddings(dataset_dir)
 
-        ignore_Warning_MMSF = True
-        if ignore_Warning_MMSF or isinstance(vid_id, str):
+        if config.ignore_Warning_MMSF or isinstance(vid_id, str):
             # Debugging on a stored video...
             cap = cv2.VideoCapture(vid_id)
         else:
@@ -117,8 +124,14 @@ class secure_access_cv:
             print(f"\n[Error]: Unable to create a VideoCapture object at {vid_id}")
             return
         
-        if self.face_detector == "hog":
-            dth_frame = 30
+        # Adjusting downscale config parameter based on video size. If video frame is large we can downscale more without losing appropriate data
+        vid_width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float `width`
+        vid_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+        config.downscale = int(vid_width/config.exp_width) * config.downscale 
+        #print(f"Size of video frame = (Width,Height) = ({vid_width},{vid_height}) with dowscaling at {config.downscale}")
+                
+        if config.face_detector == "hog":
+            dth_frame = 15
         else:
             dth_frame = 4
         frame_iter = 0 # Current frame iteration
@@ -137,14 +150,21 @@ class secure_access_cv:
             rgb_small_frame = None
             # Step 1: Detecting face on every dth_frame             
             if frame_iter%dth_frame==0:
-                if self.face_detector=="hog":
-                    downscale = 4
+                if config.face_detector=="hog":
                     # Resize frame of video to 1/4 size for faster face recognition processing
-                    small_frame = cv2.resize(frame, (0, 0), fx=(1/downscale), fy=(1/downscale))
+                    small_frame = cv2.resize(frame, (0, 0), fx=(1/config.downscale), fy=(1/config.downscale))
                     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
                     rgb_small_frame = small_frame[:, :, ::-1]
+                    if config.nvidia_gpu:
+                        detector = "cnn" # Use CNN (more accurate)
+                    else:
+                        detector = "hog"
                     # Find all the faces and face encodings in the current frame of video
-                    face_locations = face_recognition.face_locations(rgb_small_frame)
+                    face_locations = face_recognition.face_locations(rgb_small_frame,model=detector)
+                    for face_loc in face_locations:
+                        face_loc_scaled = (face_loc[0]*config.downscale,face_loc[1]*config.downscale,face_loc[2]*config.downscale,face_loc[3]*config.downscale)
+                        top, right, bottom, left = face_loc_scaled
+                        cv2.rectangle(frame_draw,(left,top),(right,bottom),(255,0,0),4)
                 else:
                     gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
                     faces = self.faceCascade.detectMultiScale(gray)          
@@ -163,7 +183,7 @@ class secure_access_cv:
                     rgb_small_frame, face_locations,face_locations_frame = self.face_recog.preprocess(frame,frame_draw,rgb_small_frame,faces,face_locations)
                     
                     # Initialize tracker with bboxes or face_locations (based on detector used) 
-                    if self.face_detector =="hog":
+                    if config.face_detector =="hog":
                         inp_formats = ["css"]*len(face_locations_frame)
                         faces_hog = list( map(to_ltwh,face_locations_frame,inp_formats) )
                         self.m_tracker.track(frame,frame_draw,faces_hog,"face") # Initialize Tracker
@@ -186,19 +206,23 @@ class secure_access_cv:
                             iou_list = [get_iou(face_ltrd,t_bbox) for t_bbox in t_bboxes]
                             iou = max(iou_list)
                             if iou > 0.5:#Found a match
-                                putText(frame_draw,f"iou of {self.m_tracker.Tracked_classes[0]} is {iou:.2f}", ( 20,140+(20*i) ) )
+                                if config.display_state:
+                                    putText(frame_draw,f"iou of {self.m_tracker.Tracked_classes[0]} is {iou:.2f}", ( 20,140+(20*i) ) )
+                                pass
                             elif iou < 0.2:# Detected face not already in tracking list
                                 new_bboxes.append(face)
                     else:
                         for i, face_loc in enumerate(face_locations):
-                            face_loc_scaled = (face_loc[0]*downscale,face_loc[1]*downscale,face_loc[2]*downscale,face_loc[3]*downscale)
+                            face_loc_scaled = (face_loc[0]*config.downscale,face_loc[1]*config.downscale,face_loc[2]*config.downscale,face_loc[3]*config.downscale)
                             t_bboxes = list( map(to_ltrd,self.m_tracker.tracked_bboxes) )
                             face_ltrd = to_ltrd(face_loc_scaled,"css")
                             face      = to_ltwh(face_loc_scaled,"css")
                             iou_list = [get_iou(face_ltrd,t_bbox) for t_bbox in t_bboxes]
                             iou = max(iou_list)
                             if iou > 0.5:#Found a match
-                                putText(frame_draw,f"iou of {self.m_tracker.Tracked_classes[0]} is {iou:.2f}", ( 20,140+(20*i) ) )
+                                if config.display_state:
+                                    putText(frame_draw,f"iou of {self.m_tracker.Tracked_classes[0]} is {iou:.2f}", ( 20,140+(20*i) ) )
+                                pass
                             elif iou < 0.2:# Detected face not already in tracking list
                                 new_bboxes.append(face) 
 
@@ -215,7 +239,6 @@ class secure_access_cv:
                     self.start_time = time.time()
 
                     self.currently_recognizing = "Appended"
-
                 else:
                     # Check if recognizer has finshed processing?
                     # a) If friendly face present --> Allow access! + Replace (track_id <---> recognized name) and color
@@ -227,16 +250,13 @@ class secure_access_cv:
             # Updating state to current for displaying...
             waitTime = self.update_state(frame_draw)
 
-            # get all active child processes
-            children = active_children()
-            # report details
-            #print(f'Active Children: {len(children)}')
-            #print(children)
-            putText(frame_draw,f"Recognizing {self.currently_recognizing} face/es  with {len(children)} subprocess running!", ( 20,180 ) )
-            # Displaying current state as frame.....
-            cv2.putText(frame_draw, f"Processing took  = {self.elapsed_time:.2f} ms" ,(20,120) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,128))
+            if config.display_state:
+                # get all active child processes
+                children = active_children()
+                cv2.putText(frame_draw,f"Recognizing {self.currently_recognizing} face/es  with {len(children)} subprocess running!", ( 20,200 ) ,cv2.FONT_HERSHEY_DUPLEX, 1, (128,128,128))
+                cv2.putText(frame_draw, f"Processing took  = {self.elapsed_time:.2f} ms" ,(20,120) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,128))
+            
             cv2.imshow('Video', frame_draw)
-
             # Hit 'Esc' on the keyboard to quit!
             k = cv2.waitKey(waitTime)
             self.elapsed_time = (time.time() - start_time)*1000 # ms
@@ -264,22 +284,20 @@ def secure_live():
     # Step 1: Loading the training and test data
     secure_acc = secure_access_cv()
     
-    dataset_dir = r"authorized_personnels\Mr haider"
-
-    secure_acc.activate_sa(0,dataset_dir= dataset_dir)
+    secure_acc.activate_sa(0,dataset_dir= config.authorized_dir)
 
 def demo():
     # Step 1: Loading the training and test data
     secure_acc = secure_access_cv()
 
-    #test_vid_path = r"Data\NonFree\Friends\Avengers_endgame_Assemble.mp4"
+    test_vid_path = r"Data\NonFree\Friends\Avengers_endgame_Assemble.mp4"
     #test_vid_path = r"Data\NonFree\Friends\Jeff_Vs_Elon.mp4"
     #test_vid_path = r"Data\NonFree\Friends\Friends_AllClothes.mp4"
-    test_vid_path = r"Data\NonFree\Friends\Friends_lightning round.mp4"
+    #test_vid_path = r"Data\NonFree\Friends\Friends_lightning round.mp4"
 
-    #dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\avengers_endgame"
+    dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\avengers_endgame"
     #dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\known_people"
-    dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\friends"
+    #dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\friends"
 
     secure_acc.activate_sa(path.abspath(test_vid_path),dataset_dir= path.abspath(dataset_dir))
 
@@ -287,5 +305,40 @@ def demo():
 if __name__== "__main__":
     # Pyinstaller fix (Reference : https://stackoverflow.com/a/32677108/11432131)
     freeze_support()
-    #demo()
-    secure_live()
+
+    parser = argparse.ArgumentParser("--Secure Access--")
+    parser.add_argument("-d","--debug", help="Debug App", type=bool,default=False)
+    parser.add_argument("-exp","--experimental", help="Turn Experimental features On/OFF", type=bool,default=False)
+    parser.add_argument("-w","--ignore_warnings", help="Ignore warning or not", type=bool,default=True)
+    parser.add_argument("-s","--display_state", help="display current (app) state", type=bool,default=False)
+    parser.add_argument("-fd","--face_detector", help="type of detector for face detection", type=str,default="hog")
+    parser.add_argument("-ft","--tracker_type", help="type of tracker for face tracking", type=str,default="MOSSE")
+    parser.add_argument("-ds","--downscale", help="downscale amount for faster recognition", type=int,default=2)# Default = 2 -> Seems adequate for video size of (Width,Height) = (640,480) ... After downsizing (320,240)
+    parser.add_argument("-rt","--recog_tolerance", help="Adjust tolerance for recognition e.g: (Strict < 0.5 < Loose) ", type=float,default=0.6)# Default = 2 -> Seems adequate for video size of (Width,Height) = (640,480) ... After downsizing (320,240)
+    parser.add_argument("-nu","--new_user", help="Add new user to list of authorized personnels", type=str,default=None)
+    args = parser.parse_args()
+    
+    # Set config variables based on parsed arguments
+    config.debug = args.debug
+    config.ignore_Warning_MMSF = args.ignore_warnings
+    config.display_state = args.display_state
+    config.face_detector = args.face_detector
+    config.tracker_type = args.tracker_type
+    config.downscale = args.downscale
+    config.recog_tolerance = args.recog_tolerance
+    config.new_user = args.new_user
+    config.experimental = args.experimental
+    
+    if config.experimental:
+        # Experimental: Features under rigorous testing.
+        try:
+            subprocess.check_output('nvidia-smi')
+            print('Nvidia GPU detected!')
+            config.nvidia_gpu = True
+        except Exception: # this command not being found can raise quite a few different errors depending on the configuration
+            print('No Nvidia GPU in system!')
+
+    if config.debug:
+        demo()
+    else:
+        secure_live()
