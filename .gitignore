@@ -25,6 +25,7 @@ __pycache__/
 Data/
 src/c__Advanced/Tracking/model_data
 src/c__Advanced/Face_Recognition/apps/Secure_Access/models
+src/c__Advanced/Face_Recognition/apps/Secure_Access/authorized_personnels/taha/
 build/
 develop-eggs/
 dist/
