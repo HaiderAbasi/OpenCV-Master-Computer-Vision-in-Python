@@ -1,3 +1,4 @@
+from distutils.log import error
 import cv2
 from numpy import random
 import numpy as np
@@ -25,6 +26,9 @@ def imshow(img_name,img,image_shape = None,Window_flag = cv2.WINDOW_AUTOSIZE,bou
     None
 
     """
+    #if img is None:
+    #    print('\n[Error!] image is None, Check Origin!\n')
+    #    exit()
     logger.debug(f"(Input) img = {img.shape}")
     if ((len(img.shape)==3) and (img.shape[2]==4)):
        # Pick up the alpha channel and delete from original
@@ -124,7 +128,7 @@ def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(
 def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],resize_to_default = True,draw_borders = False):
     """
     ---------------------------------------------------------------------------------------------
-    author: Kyle Hounslow
+    ##### author: Kyle Hounslow - modified by: Haider Abbasi
     ---------------------------------------------------------------------------------------------
     Converts a list of single images into a list of 'montage' images of specified rows and columns.
     A new montage image is started once rows and columns of montage image is filled.
@@ -271,4 +275,47 @@ def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],re
         image_montages.append(montage_image)  # add unfinished montage
     return image_montages
 
+def get_optimal_font_scale(text, width):
+    """ Returns the optical font Scale for text to fit in the rectangle 
+
+    Args:
+        text (String): _description_
+        width (int): _description_
+
+    Returns:
+        int: _description_
+    """
+    
+    for scale in reversed(range(0, 120, 1)):
+        textSize = cv2.getTextSize(text, fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=scale/10, thickness=1)
+        new_width = textSize[0][0]
+        #print(new_width)
+        if (new_width <= int(width/2)):
+            return (scale/10),new_width
+    return 1,1
+
+def putText_bbox(img,text_list,orig_list,type = "bbox"):
+    
+    fontScale,new_width = get_optimal_font_scale(text_list[0],img.shape[1])
+
+    clr_list = [(255,0,0),(0,255,0),(0,0,255),(255,255,255)]
+        
+    for idx,txt in enumerate(text_list):
+        org = orig_list[idx]
+        
+        if type=="bbox":
+            clr = clr_list[idx]
+            if idx==0:
+                # is even===> then adjust for pt center
+                #print(f"adjusted .... YAyyy! at {idx}")
+                org = (org[0]-int(new_width/2),org[1])
+            elif idx==3:
+                # is even===> then adjust for pt center
+                #print(f"adjusted .... YAyyy! at {idx}")
+                org = (org[0]-int(new_width/2),org[1])
+        else:
+            clr = random.random(size=3) * 256
+
+        #cv2.putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,fontScale,clr,4 )
+        putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,1,clr,1.5)
 # IP Basics
