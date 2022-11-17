@@ -10,6 +10,7 @@ import os
 logger.remove()
 logger.add(sink = sys.stderr, level="INFO")
 
+
 # IP Basics
 def print_h(str):
     print(f"\n##############################################\n{str}")
@@ -319,3 +320,330 @@ def putText_bbox(img,text_list,orig_list,type = "bbox"):
         #cv2.putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,fontScale,clr,4 )
         putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,1,clr,1.5)
 # IP Basics
+
+# CV 101
+RED = (0,0,255)
+GREEN = (0,255,0)
+BLUE = (255,0,0)
+ORANGE = (0,140,255)
+BROWN = (42,42,165)
+
+dark_colors = [RED,GREEN,BLUE,ORANGE,BROWN]
+
+def draw_points(image,pts,radius=2):
+    if len(image.shape)<3:
+        image = cv2.cvtColor(image,cv2.COLOR_GRAY2BGR)
+    for idx,pt in enumerate(pts):
+        if type(pt)!= tuple:
+            pt = tuple(pt)
+        rand_color = dark_colors[idx]
+        cv2.circle(image,pt,radius,rand_color,2)
+    return image
+
+
+def describe(something,title="something",display_content = False):
+    """convenience function to get knowledge about something
+
+    Args:
+        something (Any): Any type input that you want to know detail characteristics os
+    """    
+    print(f"\nDescribing {title}......")
+    t_s = type(something)
+    print(f"type = {t_s}")
+    
+    if (t_s=="String"):
+        print(f"No of chars = {len(something)}")
+    #elif (t_s=="<class 'numpy.ndarray'>"):
+    elif isinstance(something, np.ndarray):
+        print(f"numpy_array.dtype = {something.dtype}")
+        print(f"numpy_array.shape = {something.shape}")
+    elif (t_s=="<class 'tuple'>" or t_s=="<class 'list'>"):
+        print(f"No of elements = {len(something)}")
+
+    if display_content:
+        print(f"Here you go = {something}")
+    #Min = min(something)
+    Min = np.amin(something)
+    Max = np.amax(something)
+    #Max = max(something)
+    print(f"Range = ({Min}<---->{Max})\n")
+        
+
+
+class debugger:
+
+    def __init__(self,window = "Control",trackbars_list=None,max_list=None,odd_list = None):
+
+        self.window = window
+        
+        self.trackbars_list = trackbars_list
+        self.no_of_trackbars = len(trackbars_list)
+        self.debug_vars = [0] * self.no_of_trackbars
+        self.odd_list = odd_list 
+        if self.odd_list!= None:
+            idces_to_modify_max = [i for i,v in enumerate(self.odd_list) if v]
+            for idx in idces_to_modify_max:
+                max_list[idx] = max_list[idx]//2
+            print(f"max_list = {max_list}")
+        
+        cv2.namedWindow(window,cv2.WINDOW_NORMAL)
+        for idx in range(self.no_of_trackbars):
+            cv2.createTrackbar(trackbars_list[idx],self.window,self.debug_vars[idx],max_list[idx],self.nothing)
+
+
+    @staticmethod
+    def nothing():
+        pass
+
+    def update_variables(self):
+        for idx in range(self.no_of_trackbars): 
+            if ( (self.odd_list!= None) and (self.odd_list[idx]) ): # Incase of odd trackbar requested
+                curr_pos = cv2.getTrackbarPos(self.trackbars_list[idx],self.window)
+                self.debug_vars[idx] = (curr_pos)*2 + 1
+                self.debug_vars[idx] = self.debug_vars[idx] if (self.debug_vars[idx]>=3) else 3
+            else:
+                self.debug_vars[idx] = cv2.getTrackbarPos(self.trackbars_list[idx],self.window)
+
+
+
+
+class Gui():
+
+    def __init__(self):
+        self.pt = None # point instance variable
+
+        # ADVANCED #
+        self.img_draw = None
+        self.ix,self.iy = -1,-1
+        self.fx,self.fy = -1,-1
+        self.roi_confirmed = False
+        self.selected_rois = []
+
+
+    # mouse callback function
+    def __selectroi_callback(self,event,x,y,flags,param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            self.ix,self.iy = x,y
+        elif event == cv2.EVENT_MOUSEMOVE:
+            if self.roi_confirmed:
+                cv2.rectangle(self.img_draw,(self.ix,self.iy),(self.fx,self.fy),(0,255,0),2)
+                if self.ix <= self.fx :
+                    strt_col = self.ix
+                    width = self.fx - self.ix
+                else:
+                    strt_col = self.fx
+                    width = self.ix - self.fx
+                if self.iy <= self.fy:
+                    strt_row = self.iy
+                    height = self.fy - self.iy
+                else:
+                    strt_row = self.fy
+                    height = self.iy - self.fy
+                self.selected_rois.append((strt_col,strt_row,width,height))
+                self.roi_confirmed = False
+                
+        elif event == cv2.EVENT_LBUTTONUP:
+            cv2.rectangle(self.img_draw,(self.ix,self.iy),(x,y),(0,140,255),2)
+            self.fx = x
+            self.fy = y
+
+    def selectROIs(self,img,title = 'SelectROIs'):
+        self.img_draw = img.copy()# Dont want to mess up the original XD
+        cv2.namedWindow(title)
+        cv2.setMouseCallback(title,self.__selectroi_callback)
+
+        while(1):
+            cv2.imshow(title,self.img_draw)
+            k = cv2.waitKey(1) & 0xFF
+            if k == 13:# Enter
+                self.roi_confirmed = True
+            elif k == 27:
+                break
+        cv2.destroyAllWindows()
+        #print("selected_rois = ",self.selected_rois)
+    
+    @staticmethod
+    def __nothing(val):
+        pass
+
+    def selectdata(self,filenames,Window_Name ="Data Selection",trackbar_name = "choice",useMouse = False,onTop =False,data_type = "test data"):
+        
+        user_choice = 0
+
+        curr_x = 0
+        curr_y = 0
+        data_selected = False
+        def onMouse(event,x,y,flags,param): # Inner function
+            nonlocal curr_x,curr_y,data_selected
+            if event == cv2.EVENT_LBUTTONDOWN:
+                curr_x,curr_y = x,y
+            elif event == cv2.EVENT_LBUTTONUP:
+                data_selected = True
+
+        def getUserChoice():
+            nonlocal unit_row,shift,curr_y
+            #curr_y = unit_row+(shift*user_choice)
+            user_choice = ( curr_y - unit_row ) / shift
+            return user_choice
+
+        cv2.namedWindow(Window_Name)
+        if onTop:
+            cv2.setWindowProperty(Window_Name, cv2.WND_PROP_TOPMOST, 1) # Reference: https://stackoverflow.com/a/66364178/11432131
+        hp_col = 700
+        filename_w = 25
+        hp_row = 40 + filename_w*(len(filenames))
+
+        home_page = np.zeros((hp_row,hp_col,3),np.uint8)#BGR
+        txt_to_display = f"Please choose one of the following as the {data_type}...."
+        cv2.putText(home_page,txt_to_display,(20,20),cv2.FONT_HERSHEY_PLAIN,1.2,(0,140,255),1)
+        
+        col = 20
+        unit_row = 50
+        shift = 25
+        for idx,filename in enumerate(filenames):
+            txt_to_display = f"{idx}: {filename}" 
+            cv2.putText(home_page,txt_to_display,(col,unit_row+(shift*idx)),cv2.FONT_HERSHEY_PLAIN,1,(0,255,255),1)
+        cv2.createTrackbar(trackbar_name,Window_Name,user_choice,len(filenames)-1,self.__nothing)
+
+        cv2.setMouseCallback(Window_Name,onMouse)
+
+
+        prev_txt_to_display = ""
+        prev_user_choice = 0
+        while(1):
+            if useMouse:
+                choice = getUserChoice()
+                if choice>0:
+                    user_choice = round(choice)
+                else:
+                    user_choice = 0 # If it is less then zero or not choose. Consider it default : 0
+                if data_selected:
+                    print(">>>>> User_choice = ",user_choice)
+                    cv2.waitKey(0)
+            else:
+                user_choice = cv2.getTrackbarPos(trackbar_name,Window_Name)
+
+            txt_to_display = f"{user_choice}: {filenames[user_choice]}" 
+            cv2.putText(home_page,prev_txt_to_display,(col,unit_row+(shift*prev_user_choice)),cv2.FONT_HERSHEY_PLAIN,1,(0,255,255),1)
+            cv2.putText(home_page,txt_to_display,(col,unit_row+(shift*user_choice)),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
+            prev_txt_to_display = txt_to_display
+            prev_user_choice = user_choice
+
+            cv2.imshow(Window_Name,home_page)
+            k = cv2.waitKey(1) & 0xFF
+            if ( (k == 13) or data_selected ):# Enter or data choosen by mouses
+                if not data_selected:
+                    cv2.destroyWindow(Window_Name)# No longer need it       
+                break # Exit loop
+            elif k==27: #Esc pressed -> Exiting...
+                user_choice = -1
+                break
+
+        return user_choice
+
+    # ADVANCED #
+
+
+
+    def ret_point(self,event,x,y, flags, param):
+        # checking for left mouse clicks
+        if event == cv2.EVENT_LBUTTONDOWN:
+            # displaying the coordinates
+            # on the Shell
+            self.pt = (x,y)
+
+    def select_cnt(self,img,cnts,Loop=False):
+        cv2.namedWindow("Select Contour")
+        cv2.imshow("Select Contour",img)
+        cv2.setMouseCallback("Select Contour",self.ret_point)
+        matched_cnts = []
+        matched_cnts_idx = []
+        while(1):
+            # Wait for User to Select Contour
+            
+            if self.pt!=None:
+                for idx,cnt in enumerate(cnts):
+                    ret = cv2.pointPolygonTest(cnt,self.pt,False)
+                    if ret==1: # point is inside a contour ==> return its idx and cnt
+                        matched_cnts.append(cnt)
+                        matched_cnts_idx.append(idx)
+
+                if matched_cnts==[]:
+                    logger.warning("(Incorrect Selection) --> Please only select an object!!")
+                    self.pt = None # Reset point to None 
+                elif len(matched_cnts) == 1:
+                    cnt = matched_cnts[0]
+                    idx = matched_cnts_idx[0]
+                    if not Loop:
+                        cv2.destroyWindow("Select Contour")
+                    self.pt = None # Reset point to None                         
+                    return idx,cnt
+                else:
+                    # find the biggest countour (c) by the area
+                    cnt = min(matched_cnts, key = cv2.contourArea)
+                    idx = matched_cnts.index(cnt)
+                    if not Loop:
+                        cv2.destroyWindow("Select Contour")
+                    self.pt = None # Reset point to None                         
+                    return idx,cnt
+
+            k = cv2.waitKey(1)
+            if k==27:
+                logger.warning("(Esc key pressed) --> No contours selected + Exiting!!!")
+                return -1,-1 # idx = -1 (indicating no contour and exiting!)
+
+
+def noisy(noise_typ,image):
+    # > Adds gaussian , salt-pepper , poisson and speckle noise in an image
+    # Parameters
+    # ----------
+    # image : ndarray
+    #     Input image data. Will be converted to float.
+    # mode : str
+    #     One of the following strings, selecting the type of noise to add:
+
+    #     'gauss'     Gaussian-distributed additive noise.
+    #     'poisson'   Poisson-distributed noise generated from the data.
+    #     's&p'       Replaces random pixels with 0 or 1.
+    #     'speckle'   Multiplicative noise using out = image + n*image,where
+    #                 n is uniform noise with specified mean & variance.
+    
+    if noise_typ == "gauss":
+        row,col,ch= image.shape
+        mean = 0
+        var = 0.1
+        sigma = var**0.5
+        gauss = np.random.normal(mean,sigma,(row,col,ch))
+        gauss = gauss.reshape(row,col,ch)
+        noisy = image + gauss
+        return noisy
+    elif noise_typ == "s&p":
+        row,col,ch = image.shape
+        s_vs_p = 0.5
+        amount = 0.004
+        out = np.copy(image)
+        # Salt mode
+        num_salt = np.ceil(amount * image.size * s_vs_p)
+        coords = [np.random.randint(0, i - 1, int(num_salt))
+                for i in image.shape]
+        out[coords] = 1
+
+        # Pepper mode
+        num_pepper = np.ceil(amount* image.size * (1. - s_vs_p))
+        coords = [np.random.randint(0, i - 1, int(num_pepper))
+                for i in image.shape]
+        out[coords] = 0
+        return out
+    elif noise_typ == "poisson":
+        vals = len(np.unique(image))
+        vals = 2 ** np.ceil(np.log2(vals))
+        noisy = np.random.poisson(image * vals) / float(vals)
+        return noisy
+    elif noise_typ =="speckle":
+        row,col,ch = image.shape
+        gauss = np.random.randn(row,col,ch)
+        gauss = gauss.reshape(row,col,ch)        
+        noisy = image + image * gauss
+        return noisy    
+
+# CV 101
