@@ -35,7 +35,7 @@
     - Open Cmd Prompt and navigate to repo directory, 
     - Start by adding a new module virtualenv using pip.
       ```
-      python -m pip install --user virtualenv
+      pip install --user virtualenv
       ```
     > This will be used to create virtual environments 
     - Create a virtual enivonment named venv_3.8.10 
