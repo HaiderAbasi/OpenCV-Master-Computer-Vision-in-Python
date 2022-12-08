@@ -96,12 +96,17 @@ def imshow(img_name,img,image_shape = None,Window_flag = cv2.WINDOW_AUTOSIZE,bou
 
     cv2.imshow(img_name,img_disp)    
 
-def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(0, 255, 0),thickness=1,color_bg=(0, 0, 0)):
+def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(0, 255, 0),thickness=1,color_bg=(0, 0, 0),bbox_size = None):
     FONT_SCALE = 3e-3  # Adjust for larger font size in all images
     THICKNESS_SCALE = 2e-3  # Adjust for larger thickness in all images
 
     if fontScale==1:
-        height, width= img.shape[:2]
+        if bbox_size == None:
+            height, width= img.shape[:2]
+        else:
+            FONT_SCALE = 3e-2
+            THICKNESS_SCALE = 2e-2
+            width,height = bbox_size
         fontScale = min(width, height) * FONT_SCALE
         thickness = math.ceil(min(width, height) * THICKNESS_SCALE)
 
@@ -647,3 +652,53 @@ def noisy(noise_typ,image):
         return noisy    
 
 # CV 101
+
+# Advanced
+
+def disp_fps(frame,start_time):
+
+    FONT_SCALE = 3e-3
+    THICKNESS_SCALE = 1e-3
+
+    height, width= frame.shape[:2]
+    
+    font_scale = min(width, height) * FONT_SCALE
+    thickness = math.ceil(min(width, height) * THICKNESS_SCALE)
+
+    fps_txt = f"FPS: = {1.0 / (time.time() - start_time):.2f}"
+    putText(frame, fps_txt, org=(10, 20),fontScale=font_scale)
+
+
+def get_fileName(file_path):
+    if not os.path.isfile(file_path):
+        print(f"Not a file path...{file_path}\nCheck again!")
+        return None
+
+    file_basename = os.path.basename(file_path)
+    fileName = os.path.splitext(file_basename)[0]
+    return fileName
+    
+def get_data(topic, type = "img", folder_dir = None):
+
+    if folder_dir==None:
+        if topic =="tracking":
+            folder_dir = "Data/NonFree/Advanced/Tracking/test_videos"
+            fomrats = (".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm")
+        elif topic =="multitracking":
+            folder_dir = "Data/NonFree/Advanced/Tracking/multi_test_videos"
+            fomrats = (".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm")
+
+
+    data_dirs = []
+    filenames = []
+    for file in os.listdir(folder_dir):
+        #if file.endswith(".jpg"):
+        if file.endswith(fomrats):
+            filename, _ = os.path.splitext(file)
+            file_path = os.path.join(folder_dir, file)
+            data_dirs.append(file_path)
+            filenames.append(filename)
+    return data_dirs,filenames
+
+
+# Advanced
