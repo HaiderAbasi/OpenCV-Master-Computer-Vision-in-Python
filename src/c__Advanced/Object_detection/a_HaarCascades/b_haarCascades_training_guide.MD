@@ -1,7 +1,10 @@
 # Haar Cascade Training 
 
+### PreReq:
+ - *Follow from **Step-4 Onwards** in Colab (Faster Training :))*
+   - [Colab](https://colab.research.google.com/drive/1tM9cmREESuWfdSUDseK-WPfZOkswvr6v)
 
-
+---
 **0)** *Gather Training Videos from ROS2 Simulation*
 <br/>
 <p align="center">
