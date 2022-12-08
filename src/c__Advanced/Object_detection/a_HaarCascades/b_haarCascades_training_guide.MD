@@ -5,7 +5,7 @@
 **0)** *Gather Training Videos from ROS2 Simulation*
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/0.png" style="width:700px;height:100px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/0.png" style="width:700px;height:100px;"><br/><br/>
 </p>
 <br/>
 
@@ -16,7 +16,7 @@ from utils import extract_frames_from_batch
   ```
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/1.png" style="width:600px;height:300px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/1.png" style="width:600px;height:300px;"><br/><br/>
 </p>
 <br/>
 
@@ -24,7 +24,7 @@ from utils import extract_frames_from_batch
 
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/2.png" style="width:600px;height:400px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/2.png" style="width:600px;height:400px;"><br/><br/>
 </p>
 <br/>
 
@@ -35,7 +35,7 @@ count_files_in_dirs_n_subdirs(Path/To/Training, display_bar=True)
 ```
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/3.png" style="width:450px;height:300px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/3.png" style="width:450px;height:300px;"><br/><br/>
 </p>
 <br/>
 
@@ -45,7 +45,7 @@ count_files_in_dirs_n_subdirs(Path/To/Training, display_bar=True)
 
 > a) Windows_Auto_Train.bat
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/Windows_bat_run.png" style="width:750px;height:300px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/Windows_bat_run.png" style="width:750px;height:300px;"><br/><br/>
 </p>
 
 > b) Linux_Auto_Train.sh
@@ -66,12 +66,12 @@ from util.py import generate_negative_description_file
 <br/>
 
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/5.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/5.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/5b.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/5b.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 
@@ -79,7 +79,7 @@ from util.py import generate_negative_description_file
 
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/8.png" style="width:600px;height:300px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/8.png" style="width:600px;height:300px;"><br/><br/>
 </p>
 <br/>
 
@@ -98,13 +98,13 @@ from util.py import generate_negative_description_file
 
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/6.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/6.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/6b.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/6b.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 
@@ -114,7 +114,7 @@ from util.py import generate_negative_description_file
 ```
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/7.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/7.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 
@@ -128,7 +128,7 @@ from util.py import generate_negative_description_file
 
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/8b.png" style="width:450px;height:150px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/8b.png" style="width:450px;height:150px;"><br/><br/>
 </p>
 <br/>
 
@@ -140,6 +140,6 @@ test_trained_cascade("vids/xyz.avi","Cascades/trained_cascade.xml")
 ```
 <br/>
 <p align="center">
-   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/tree/temp/res/HaarCascade/Training_Steps/9.png" style="width:600px;height:300px;"><br/><br/>
+   <img src="https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/HaarCascade/Training_Steps/9.png" style="width:600px;height:300px;"><br/><br/>
 </p>
 <br/>
