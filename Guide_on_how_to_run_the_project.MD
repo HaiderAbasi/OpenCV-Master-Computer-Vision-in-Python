@@ -1,4 +1,8 @@
 ## Windows 10 
+   ### Video Guide
+   > Follow **Section 1: Lecture 2** (Environment-Setup)  on [**Udemy**](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=LAUNCH) :)
+---
+### Steps:
 
 1) **Download and install** 
    - **Python 3.8.10** [> Link <](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
