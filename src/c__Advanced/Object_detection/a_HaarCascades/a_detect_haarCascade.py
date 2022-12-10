@@ -51,7 +51,8 @@ def main():
     if not cap.isOpened:
         print('--(!)Error opening video capture')
         exit(0)
-        
+    
+    cv2.namedWindow("TrafficLight-detection_HC",cv2.WINDOW_NORMAL)
     while True:
         ret, frame = cap.read()
         
@@ -62,7 +63,7 @@ def main():
         # [Task]: Detect object [Traffic Light] in frame using Haar Cascade
         hc_detector.detect(frame,True)
         
-        cv2.imshow("Megamind",frame)
+        cv2.imshow("TrafficLight-detection_HC",frame)
         if cv2.waitKey(10) == 27:
             break
         
