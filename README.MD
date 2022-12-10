@@ -1,6 +1,6 @@
 # OPENCV4-Master-Computer-Vision-in-Python-
 
-[![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/cover.png)]
+![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/cover.png)
 ## Repository contents
 <details open="open">
   <summary>Table of Contents</summary>
@@ -50,25 +50,25 @@ From IP basics to advanced and the final project, We will create everything from
   - ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_A.gif)<br/><br/>
 * **Feature Matching**<br/><br/>
   - **Keypoints**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Features.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Features.gif)<br/><br/>
   - **Matching**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Feature_Matching.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Feature_Matching.gif)<br/><br/>
 * **Object Detection**<br/><br/>
   - **Haar Cascade**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_HC.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_HC.gif)<br/><br/>
   - **YOLO**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_Yolo.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_Yolo.gif)<br/><br/>
 * **Object Tracking**<br/><br/>
   - **SOT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_single.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_single.gif)<br/><br/>
   - **MOT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_multi.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_multi.gif)<br/><br/>
   - **DeepSORT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_DeepSort.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_DeepSort.gif)<br/><br/>
 * **Face Recognition**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Face_Recognition.gif)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Face_Recognition.gif)<br/><br/>
 * **Secure Access**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/coming_soon.jpg)<br/><br/>
+&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/coming_soon.jpg)<br/><br/>
 
 
 ## 🧊 Pre-Course Requirments:
