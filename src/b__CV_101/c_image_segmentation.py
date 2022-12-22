@@ -1,6 +1,51 @@
 import cv2
 import numpy as np
-from src.utilities import debugger,build_montages,print_h
+from src.utilities import debugger,build_montages,print_h,imshow,keep_blobs_by_mask,extract_blobs_on_pattern,get_centroid
+
+from loguru import logger
+
+
+def segment_plants(image,debug=True):
+    # Hint: Utilize segmentation class and investigate which segmentation works best for our case and Why?
+    # Write Code here...
+    plants_segmented = image.copy()
+
+        
+    return plants_segmented
+
+
+
+def assignment(debug= True):
+    if debug:
+        print_h("[Assignment]: Segment max plants from the field\n")
+    # Assignment: Cleanly segment maximum no of plants in the image provided.
+    #
+    #
+    # Returns: (BGRA) 4-D image as an ouput. Where first 3 channels are just the original image (BGR)
+    #                                                 Last channel is alpha (mask). Indicating segmented plants 
+    #
+    # Hint  : A combination of segmentation algorithm might give a cleaner segmentation result.
+    #
+    
+    # Reading the image
+    field = cv2.imread("Data/drone_view.png")
+    
+    if debug:
+        imshow("field",field)
+
+    # Task Function
+    plants_segmented = segment_plants(field,debug)
+    
+    if np.array_equal(plants_segmented,field):
+        logger.error("segment_plants() needs to be coded to get the required(Segmented Plant) result.")
+        exit(0)
+        
+    if debug:
+        imshow("plants_segmented",plants_segmented)
+        cv2.waitKey(0)
+        
+    return plants_segmented
+
 
 
 class segmentation:
@@ -33,7 +78,10 @@ class segmentation:
         return mask
     
     def segment_edges(self,img,thresh_l,thresh_h,aperture):
-        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        if len(img.shape)>2:
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        else:
+            gray = img
         mask = cv2.Canny(gray,thresh_l,thresh_h,None,aperture)
         return mask
     
@@ -69,7 +117,7 @@ class segmentation:
                 self.debugger.update_variables() # Get updated variables
                 hue_l,hue_h= self.debugger.debug_vars[0:2]
             else:
-                hue_l= 100;hue_h = 255
+                hue_l= 44;hue_h = 91
             segmented = self.segment_color(img,hue_l,hue_h)
         elif method == "edges":
             if tune:
@@ -79,7 +127,7 @@ class segmentation:
                 self.debugger.update_variables() # Get updated variables
                 thresh_l,thresh_h,aperture= self.debugger.debug_vars[0:4]
             else:
-                thresh_l=50;thresh_h=150;aperture=3
+                thresh_l=185;thresh_h=255;aperture=5
             segmented = self.segment_edges(img,thresh_l,thresh_h,aperture)
         elif method =="kmeans":
             if tune:
@@ -237,4 +285,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
