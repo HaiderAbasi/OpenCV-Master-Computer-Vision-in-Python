@@ -1,6 +1,79 @@
 import cv2
 import numpy as np
+from loguru import logger
+
 from src.utilities import build_montages,print_h
+
+
+o_s = 100
+def on_overlayS_change(val):
+    global o_s
+    o_s = val
+
+def img_registration(obj,scene,debug = True):
+    #  Hint     : Find Homography will be be critical here. 
+
+    # Write Code here
+    obj_reg_on_scene = scene.copy()
+    
+    
+    return obj_reg_on_scene
+
+
+def assignment(debug = True):
+    # Assignment: Orthomosaic is a composite image that is created by stitching together multiple overlapping 
+    #             images of an area taken from the same perspective. The images are geometrically corrected so 
+    #             that the scale is uniform across the entire image. This process is known as orthorectification.
+    #             Here we have an orthomosaic and a distorted image taken by a drone from some part of the area
+    #             of which the orthomosaic was generated from. But at some other time.   
+    #  Task     : Your task is to use the orthomosaic to correct the distortions in the distorted image and 
+    #             overlay it on the orthomosaic.(This will be useful in analyzig the recent changes that had
+    #                                             had happened in the area) 
+    #
+    #  Returns  : (img) drone view mapped on the mosaic using image registration.
+    #
+    #  Hint     : See Image registration in this regard.
+    #             Reference: https://www.mathworks.com/discovery/image-registration.html#:~:text=Image%20registration%20is%20an%20image,are%20common%20when%20overlaying%20images.
+    #                        Further read: https://analyticsindiamag.com/what-is-image-registration-and-how-does-it-work/
+    print_h("[Assignment]:  Estimate the relative drone pose (utilizing the the drone view with known map using feature detection and mapping)\n")
+
+    # Input
+    drone_view = cv2.imread("Data/test\DSC00153.JPG")
+
+    map = cv2.imread("Data/test/building_mosaic.tif")
+
+    if debug:
+        cv2.namedWindow("> drone_view < ",cv2.WINDOW_NORMAL)
+        cv2.imshow("> drone_view < ",drone_view)
+        cv2.waitKey(0)
+        cv2.destroyWindow("> drone_view < ")
+    
+    images = []
+    titles = []
+    images.append(drone_view)
+    titles.append("drone_view")
+    
+
+    # Task Function
+    img_mapped_on_map = img_registration(drone_view,map,debug)
+    
+    if (np.array_equal(img_mapped_on_map,map)):
+        logger.error("img_registration() needs to be coded to get the required(distorted image registered on the orthomosaic) result.")
+        exit(0)
+
+
+    # Output (Display)
+    if debug:
+        # Close previously opened windows
+        cv2.destroyAllWindows()
+        images.append(img_mapped_on_map)
+        titles.append("img_mapped_on_map")
+        montage = build_montages(images,None,None,titles,True,True)
+        for montage_img in montage:
+            cv2.imshow("Image-registration",montage_img)
+        cv2.waitKey(0)
+        
+    return img_mapped_on_map
 
 
 
@@ -101,20 +174,22 @@ def vis_features(img):
     cv2.waitKey(0)
 
 
-def find_obj_inscene(obj,scene,method="sift"):
+def find_obj_inscene(obj,scene,method="sift",debug=True,min_match_count = 15):
     
     images = []
     titles = []
     
     # Extract features
     if method =="orb":
-        print("\n> Using ORB for detection and matching")
+        if debug:
+            print("\n> Using ORB for detection and matching")
         orb = cv2.ORB_create()
         # find the keypoints and descriptors with ORB
         kp1, des1 = orb.detectAndCompute(obj,None)
         kp2, des2 = orb.detectAndCompute(scene,None) 
     elif method =="sift":
-        print("\n> Using Sift for detection and matching")
+        if debug:
+            print("\n> Using Sift for detection and matching")
         sift = cv2.SIFT_create()
         # find the keypoints and descriptors with SIFT
         kp1, des1 = sift.detectAndCompute(obj,None)
@@ -125,7 +200,7 @@ def find_obj_inscene(obj,scene,method="sift"):
 
     # Feature Matching
     if method == "orb":
-        # create BFMatcher object
+        # create BFMatcher drone_viewect
         # 1) normType =  Normalization method used : Norm_hamming is recommend for Orb feature extractor
         # 2) crossCheck = crosscheck the matches: Set to true If not using Lowe's ratio test.
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -150,13 +225,16 @@ def find_obj_inscene(obj,scene,method="sift"):
 
 
     # Retreiving only matches that are actually part of object in scene
-    MIN_MATCH_COUNT = 10    
+    M = None
+    if debug:
+        print(len(good))
+    MIN_MATCH_COUNT = min_match_count    
     if len(good)>MIN_MATCH_COUNT:
         src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
         matchesMask = mask.ravel().tolist()
-        h,w,d = obj.shape
+        h,w = obj.shape[0:2]
         pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts,M)
         scene = cv2.polylines(scene,[np.int32(dst)],True,255,3, cv2.LINE_AA)
@@ -174,13 +252,15 @@ def find_obj_inscene(obj,scene,method="sift"):
     images.append(matched_img)
     titles.append(f"Feature Matching ({method})")
     
-    # Displaying image and threshold result
-    montage = build_montages(images,None,None,titles,True,True)
-    for montage_img in montage:
-        method_str = f"({method})"
-        cv2.imshow("find_Obj_in_Scene " + method_str.upper(),montage_img)
-    cv2.waitKey(0)
+    if debug:
+        # Displaying image and threshold result
+        montage = build_montages(images,None,None,titles,False,True)
+        for montage_img in montage:
+            method_str = f"({method})"
+            cv2.imshow("find_Obj_in_Scene " + method_str.upper(),montage_img)
+        cv2.waitKey(0)
 
+    return M
 
 
 def main():
@@ -208,4 +288,9 @@ def main():
 
 
 if __name__ =="__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:    
+        main()
