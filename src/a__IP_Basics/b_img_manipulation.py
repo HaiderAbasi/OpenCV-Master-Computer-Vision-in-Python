@@ -3,6 +3,64 @@ import numpy as np
 
 from src.utilities import putText_bbox,build_montages,print_h,imshow
 
+from loguru import logger
+
+def apocalypse(day,moon,moon_mask,sun_loc,rad):
+    # [Solar Eclipse]
+    # Where Moon comes in between the sun and the earth. :)
+    
+    eclipse = day.copy()
+    
+    # Write Code here...
+    
+        
+    return eclipse
+
+
+def assignment(debug = True):
+    # Assignments    :    Complete apocalypse() to turn sunset to solar eclipse
+    #
+    # Expected Output:    (img) Moon instead of sun and the whole area is much darker.
+    #
+    # Hint           :    See circle, bitwise_not in OPENCV
+    #                :    Changing image brightness might be difficult with simple image manipulation
+    #                     because of overflow issues. Try multiplication to avoid them.
+    
+    if debug:
+        print_h("[Assignment]: Remove particular ROI(Sun) from an img(Sunset_img)\n")
+    
+    # [ Inputs you are provided ]
+    # > Sunset image + Sun Location (x,y) + Sun radius
+    day  = cv2.imread("Data/sunset.jpg")
+    SUN_LOC = ( int(day.shape[1]/2) + 38 , int(day.shape[0]/2) )
+    RAD = 300
+    # > Moon Image + Moon Mask
+    moon_w_tranparency = cv2.imread(r"Data\moon.png",cv2.IMREAD_UNCHANGED)
+    moon = moon_w_tranparency[:,:,:3]
+    moon_mask = moon_w_tranparency[:,:,3] # Extracting the alpha(mask) chnnel from a bgra image
+    
+    if debug:
+        # Displaying Inputs
+        imshow("day",day)
+        imshow("moon_img",moon)
+        imshow("moon_mask",moon_mask)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    # Function that takes our sunset image and turns it into a gloomy solar eclipse
+    eclipse = apocalypse(day,moon,moon_mask,SUN_LOC,RAD)
+    
+    if np.array_equal(day,eclipse):
+        logger.error("apocalypse() needs to be coded to get the required(solar-eclipse) result.\n")
+        exit(0)
+    
+    if debug:
+        # Displaying the final output
+        imshow("eclipse",eclipse)
+        cv2.waitKey(0)
+        
+    return eclipse
+
 
 
 
@@ -140,4 +198,9 @@ def main():
     
 
 if __name__ =="__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
