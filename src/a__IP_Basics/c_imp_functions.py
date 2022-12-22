@@ -2,11 +2,59 @@ import cv2
 from src.utilities import imshow,print_h,build_montages
 from loguru import logger
 
+import numpy as np
+
+def get_plant(field_img):
+    
+    selected_plant = field_img.copy()
+    
+    # Write Code here... 
+    # Hint: Investigate HSL channels for the right answer
+
+
+    return selected_plant
+
+def assignment(debug = True):
+    # Assignment: Display (only) the bottom-left plant in the given image of plant-field.
+    #             Requirement: Result should be in single-channel (No-Plant-Shadow)
+    #
+    # Returns   : (img) Cropped bottom-left plant image
+    #
+    #
+    # Hint      : Shadow is an abscence of light (illumination). If we want to get rid of them
+    #                                                            We can go into color spaces
+    #                                                            that seperate color from illumination
+    
+    if debug:
+        print_h("[Assignment]: Retreive and display only the (bottom-left) plant in the field\n")
+
+    # Input
+    field_img = cv2.imread("Data\drone_view.png")
+    if debug:
+        imshow("field_img",field_img)
+        cv2.waitKey(0)
+
+    # Task Function
+    selected_plant = get_plant(field_img)
+
+    if np.array_equal(field_img,selected_plant):
+        logger.error("get_plant() needs to be coded to get the required(btm-left plant) result.\n")
+        exit(0)
+
+    # Output (Display)
+    if debug:
+        cv2.destroyAllWindows()
+        imshow("selected_plant",selected_plant)
+        cv2.waitKey(0)
+        
+    return selected_plant
+
+
 
 def main():
     
     # Task: Learn two important functions in OpenCV [cv2.selectROI, cv2.cvtColor]
-    print_h("Learn to important functions in OpenCV --> [cv2.selectROI, cv2.cvtColor]")
+    print_h("Learn to important functions in OpenCV --> [cv2.selectROI, cv2.cvtColor]\n")
     
     # Read an image
     img = cv2.imread("Data/messi5.jpg")
@@ -61,9 +109,11 @@ def main():
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
-    
-
-
 
 if __name__ == "__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()

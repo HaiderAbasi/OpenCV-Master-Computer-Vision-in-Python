@@ -4,6 +4,61 @@ import numpy as np
 from src.utilities import imshow,build_montages,print_h
 
 
+
+def highlight_roi(image,debug = True):
+    # Hint: Enhancing meteor edges could be the key but there is alot of noise so some smoothing is required
+
+    img_roi_highlighted = image.copy()
+    
+    return img_roi_highlighted
+
+
+def assignment(debug = True):
+    if debug:
+        print_h("[Assignment]: Highlight falling meteor in the scene\n")
+    # Assignment: Define the algorithm whos goal is to highlight meteor (roi) in the whole scene
+    # 
+    #
+    # Hint: Along with using filter to silence the noise, Look into Unsharp Masking for highlighting
+    #       Reference: https://scikit-image.org/docs/stable/auto_examples/filters/plot_unsharp_mask.html
+    #
+    # 
+    # Output: Video with > Roi-highlighted < saved to disk
+    #
+    
+    vid = cv2.VideoCapture("Data\meteor_mini.mp4")
+    
+    # Extracting input video properties to be used for output videowriter initialization
+    inp_fps = vid.get(cv2.CAP_PROP_FPS)
+    width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    size = (int(width),int(height))
+
+    vid_roi_highlighted = cv2.VideoWriter("src/b__CV_101/vid_roi_highlighted.avi",cv2.VideoWriter_fourcc(*'MJPG'),inp_fps,size)
+    
+    while(vid.isOpened()):
+        ret,frame = vid.read()
+        if ret:
+            if debug:
+                imshow("Meteor_strike (Orig)",frame)
+            # ### Task Function ###
+            roi_highlighted = highlight_roi(frame,debug)
+            # Writing video to disk
+            vid_roi_highlighted.write(roi_highlighted)
+            # Output (Display)
+            if debug:
+                imshow("[2] Meteor strike",roi_highlighted)
+            k=cv2.waitKey(1)
+            if k==27:
+                break
+        else:
+            print("Video Ended")
+            break
+
+    vid_roi_highlighted.release()
+
+
+
 k_w = 3
 k_h = 3
 
@@ -172,9 +227,6 @@ def main():
         if k==27:
             break
 
-
-
-
     
 
     # Task 3: Edge detection using high pass filters (Choise of filter depends on the type of edge we want)
@@ -190,4 +242,10 @@ def main():
 
         
 if __name__ == "__main__":
-    main()
+    
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
