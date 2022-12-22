@@ -1,5 +1,114 @@
 import cv2
-from src.utilities import build_montages,print_h,Gui
+from src.utilities import build_montages,print_h,Gui,putText,RetLargestContour
+
+from loguru import logger
+import numpy as np
+# import the necessary packages
+
+class ShapeDetector:
+	def __init__(self):
+		print("\n### Kudos to PyimageSearch :)")
+	def detect(self, c):
+		# initialize the shape name and approximate the contour
+		shape = "unidentified"
+		peri = cv2.arcLength(c, True)
+		approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+        # if the shape is a triangle, it will have 3 vertices
+		if len(approx) == 3:
+			shape = "triangle"
+		# if the shape has 4 vertices, it is either a square or
+		# a rectangle
+		elif len(approx) == 4:
+			# compute the bounding box of the contour and use the
+			# bounding box to compute the aspect ratio
+			(x, y, w, h) = cv2.boundingRect(approx)
+			ar = w / float(h)
+			# a square will have an aspect ratio that is approximately
+			# equal to one, otherwise, the shape is a rectangle
+			shape = "square" if ar >= 0.95 and ar <= 1.05 else "rectangle"
+		# if the shape is a pentagon, it will have 5 vertices
+		elif len(approx) == 5:
+			shape = "pentagon"
+		# otherwise, we assume the shape is a circle
+		else:
+			shape = "circle"
+		# return the name of the shape
+		return shape
+  
+  
+def identify_shape(img,debug = True):
+
+    img_shape_identified = img.copy()
+    valid_shapes = [] # Identified Valid shapes
+    valid_shapes_cntrs = [] # Corresponding shapes centers
+    # Write code here
+    
+    
+    
+    
+    return img_shape_identified,valid_shapes,valid_shapes_cntrs
+
+
+def assignment(debug = True):
+    # Assignment : Use Contours to Identify shape of each object. + 
+    #              Color each object based on their hierichecal level.
+    #                [i.e. Innormost would be the strongest color]
+    #
+    # Returns    : (List[String]) Identified shapes
+    #              (List[Tuple])  Centers of those Shapes 
+    #
+    # Hint       : Contours Hierarchy might be particularly useful here.
+    #              Especially parent-child relationship
+    #              Resources: https://docs.opencv.org/4.x/d9/d8b/tutorial_py_contours_hierarchy.html
+    #
+    #
+    if debug:
+        print_h("[Assignment]: Use Contours to Identify shape of each object + center of object based on heirarchical level\n")
+
+    # Input
+    img = cv2.imread("Data\pic5.png")
+    
+    if debug:
+        cv2.imshow("> Shapes < ",img)
+        cv2.waitKey(0)
+        cv2.destroyWindow("> Shapes < ")
+        
+    images = []
+    titles = []
+    images.append(img)
+    titles.append("Img")
+
+    # Task function
+    img_shape_identified,shapes,shapes_cntrs = identify_shape(img,debug)
+
+    if np.array_equal(img_shape_identified,img):
+        logger.error("identify_shape() needs to be coded to get the required(Shapes identified) result.")
+        exit(0)
+    
+    if debug:
+        print(f"\n\nFound {len(shapes)} shapes. These are...\n")
+        print(shapes)
+        print(shapes_cntrs,"\n")
+        
+    # Output(Display)
+    images.append(img_shape_identified)
+    titles.append("img_shape_identified")
+    
+    if debug:
+        # Displaying image and threshold result
+        montage = build_montages(images,None,None,titles,True,True,True)
+        for montage_img in montage:
+            #imshow("Found Clusters",cluster,cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Assignment",montage_img)
+        cv2.waitKey(0)
+        
+    
+    return shapes,shapes_cntrs
+
+
+
+
+
 
 
 
@@ -161,4 +270,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
