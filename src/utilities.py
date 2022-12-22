@@ -10,6 +10,7 @@ import os
 logger.remove()
 logger.add(sink = sys.stderr, level="INFO")
 
+#from skimage import morphology
 
 # IP Basics
 def print_h(str):
@@ -122,16 +123,16 @@ def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(
     text_w, text_h = text_size
     rect_w = text_w
     rect_h = text_h
-    if img.shape[1] - (rect_x + text_w) > ext:
+    if ( ((img.shape[1] - (rect_x + text_w)) > ext) and (x > ext) ):
         rect_w = rect_w + ext
-    if img.shape[0] - (rect_y + text_h) > ext:
+    if ( ((img.shape[0] - (rect_y + text_h)) > ext) and (y > ext) ):
         rect_h = rect_h + ext
 
     #cv2.rectangle(img, org, (x + text_w, y + text_h), color_bg, -1)
     cv2.rectangle(img, org, (rect_x + rect_w, rect_y + rect_h), color_bg, -1)
     cv2.putText(img, text, (x,int( y + text_h + fontScale - 1)), font, fontScale, color, thickness)
 
-def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],resize_to_default = True,draw_borders = False):
+def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],resize_to_default = True,draw_borders = False,title_at_end = False):
     """
     ---------------------------------------------------------------------------------------------
     ##### author: Kyle Hounslow - modified by: Haider Abbasi
@@ -202,17 +203,6 @@ def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],re
 
         logger.debug(f"Required Image shape = {(image_shape[1],image_shape[0])}")
 
-      
-
-        # ref_width = 640
-        # ref_height = 480
-        # if ((height>=ref_height) or (width>=ref_width)): # We have image larger then our screen 
-        #     #aspect_ratio = width/height
-        #     size_to_ref = width//ref_width if width>height else height//ref_height
-        #     image_shape = (int(width/size_to_ref),int(height/size_to_ref))
-        # else: 
-        #     image_shape = (image_list[0].shape[1],image_list[0].shape[0]) # Use shape of first image in images
-
 
     if len(image_shape) != 2:
         raise Exception('image shape must be list or tuple of length 2 (rows, cols)')
@@ -262,7 +252,12 @@ def build_montages(image_list, image_shape=None, montage_shape=None,titles=[],re
                 txt_color =  0 if img[0][0] > 128 else 255
             else:
                 txt_color = (255,255,255)
-            putText(img,titles[idx],(20,20),cv2.FONT_HERSHEY_PLAIN,1,txt_color,1)
+            
+            title_loc = (20,20)
+            if title_at_end:
+                i_r,i_c = img.shape[0:2]
+                title_loc = ( int((2*i_c)/5) + 20 , i_r - 20 )
+            putText(img,titles[idx],title_loc,cv2.FONT_HERSHEY_PLAIN,1,txt_color,1)
 
         # draw image to black canvas
         montage_image[cursor_pos[1]:cursor_pos[1] + image_shape[1], cursor_pos[0]:cursor_pos[0] + image_shape[0]] = img
@@ -324,6 +319,232 @@ def putText_bbox(img,text_list,orig_list,type = "bbox"):
 
         #cv2.putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,fontScale,clr,4 )
         putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,1,clr,1.5)
+
+def get_circular_regions(img):
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    #img_circles = img.copy()
+
+    NumOfVotesForCircle = 40 #parameter 1 MinVotes needed to be classified as circle
+    CannyHighthresh = 130 # High threshold value for applying canny
+    mindDistanBtwnCircles = 10 # kept as sign will likely not be overlapping
+    max_rad = 200 # smaller circles dont have enough votes so only maxRadius need to be controlled 
+                    # As signs are right besides road so they will eventually be in view so ignore circles larger than said limit
+
+    mask_circles = np.zeros((img.shape[0],img.shape[1]),np.uint8)
+    # 4. Detection (Localization)
+    circles = cv2.HoughCircles(gray,cv2.HOUGH_GRADIENT,1,mindDistanBtwnCircles,param1=CannyHighthresh,param2=NumOfVotesForCircle,minRadius=16,maxRadius=max_rad)
+    # 4a. Detection (Localization) Checking if circular regions were localized
+    circless = []
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
+        # 4b. Detection (Localization) Looping over each localized circle
+        for i in circles[0,:]:
+            center =(i[0],i[1])
+            radius = i[2]
+            circless.append([center,radius])
+            #cv2.circle(img_circles,center,radius,(120,128,255),4)
+            cv2.circle(mask_circles,center,radius,255,-1)
+    
+    return mask_circles,circless
+
+def get_rois_mask(img_smarties):
+    # hls = cv2.cvtColor(img_smarties,cv2.COLOR_BGR2HLS)
+    # hue = hls[:,:,0]
+    
+    # edges = cv2.Canny(hue,50,150,None,3)
+    # cv2.findContours(edges,cv2.RETR_EXTERNAL)
+    # Generating ground replica 
+    
+    
+    base_clr = img_smarties[0][0]
+    Ground_replica = np.ones_like(img_smarties)*base_clr
+    
+    # Step 2: Foreground Detection
+    change = cv2.absdiff(img_smarties, Ground_replica)
+    change_gray = cv2.cvtColor(change, cv2.COLOR_BGR2GRAY)
+    change_mask = cv2.threshold(change_gray, 15, 255, cv2.THRESH_BINARY)[1]
+    
+    return change_mask
+
+def get_centroid(cnt):
+    M = cv2.moments(cnt)
+    if M['m00']==0: # If its a line (No Area) then use minEnclosingcircle and use its center as the centroid
+        (cx,cy) = cv2.minEnclosingCircle(cnt)[0]        
+        return (int(cx),int(cy))
+    else:
+        cx = int(M['m10']/M['m00'])
+        cy = int(M['m01']/M['m00'])
+        return (cx,cy)
+
+# [NEW]: Find closest point in a list of point to a specific position
+def closest_node(node, nodes):
+    nodes = np.asarray(nodes)
+    dist_2 = np.sum((nodes - node)**2, axis=(nodes.ndim-1))
+    return np.argmin(dist_2)
+
+def euc_dist(a,b):
+    return math.sqrt( ( (a[1]-b[1])**2 ) + ( (a[0]-b[0])**2 ) )
+
+# def bwareaopen(image):
+#     imglab = morphology.label(image) # create labels in segmented image
+#     cleaned = morphology.remove_small_objects(imglab, min_size=64, connectivity=2)
+
+#     smallies_removed = np.zeros((cleaned.shape)) # create array of size cleaned
+#     smallies_removed[cleaned > 0] = 255 
+#     smallies_removed= np.uint8(smallies_removed)
+    
+#     return smallies_removed
+
+def keep_blobs_by_mask(img,mask):
+    # Algo: 
+    # Preprocess: Delete blobs too small in img
+    # 1) Find contours in image
+    # 2) Loop over each, calculate bbox.
+    #    In each rect, check in the mask.
+    #                       if any():
+    #                                intersects: appemd cnt to list of valid cnts
+    # 3) Draw valid cnts on new image
+    cnts = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)[0]
+    valid_cnts = []
+    valid_centroids = []
+    for cnt in cnts:
+        r = cv2.boundingRect(cnt)
+        x,y,w,h = r
+        if (mask[y:y+h,x:x+w]).any():
+            valid_cnts.append(cnt)
+            valid_centroids.append(get_centroid(cnt))
+    
+    blobsbymask = np.zeros_like(mask)
+    if valid_cnts!=[]:
+        cv2.drawContours(blobsbymask,valid_cnts,-1,255,-1)
+        
+    return blobsbymask,valid_cnts,valid_centroids
+   
+
+def ApproxDistBWCntrs(cnt,cnt_cmp):
+    # compute the center of the contour
+    M = cv2.moments(cnt)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    # compute the center of the contour
+    M_cmp = cv2.moments(cnt_cmp)
+    cX_cmp = int(M_cmp["m10"] / M_cmp["m00"])
+    cY_cmp = int(M_cmp["m01"] / M_cmp["m00"])
+    minDist=euc_dist((cX,cY),(cX_cmp,cY_cmp))
+    Centroid_a=(cX,cY)
+    Centroid_b=(cX_cmp,cY_cmp)
+    return minDist,Centroid_a,Centroid_b
+
+def RetLargestContour(gray,cnts = None):
+    if cnts is None:
+        thresh=np.zeros(gray.shape,dtype=gray.dtype)
+        _,bin_img = cv2.threshold(gray,0,255,cv2.THRESH_BINARY)
+        #Find the two Contours for which you want to find the min distance between them.
+        cnts = cv2.findContours(bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
+    else:
+        # We would have already had the thresh to extract contours from them
+        thresh = gray
+    Max_Cntr_area = 0
+    Max_Cntr_idx= -1
+    for index, cnt in enumerate(cnts):
+        area = cv2.contourArea(cnt)
+        if area > Max_Cntr_area:
+            Max_Cntr_area = area
+            Max_Cntr_idx = index
+
+    Largest_cnt = []
+    if (Max_Cntr_idx!=-1):
+        thresh = cv2.drawContours(thresh, cnts, Max_Cntr_idx, (255,255,255), -1) # [ contour = less then minarea contour, contourIDx, Colour , Thickness ]
+        Largest_cnt = cnts[Max_Cntr_idx]
+    
+    return thresh, Largest_cnt
+
+     
+def extract_blobs_on_pattern(BW,MaxDistance):
+    """Estimate the mid-lane trajectory based on the detected midlane (patches) mask
+
+    Args:
+        BW (numpy_1d_array): Midlane (patches) mask extracted from the GetLaneROI()
+        MaxDistance (int): max distance for a patch to be considered part of the midlane 
+                                      else it is noise
+
+    Returns:
+        numpy_1d_array: estimated midlane trajectory (mask)
+    """
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(7,7))
+    BW = cv2.morphologyEx(BW,cv2.MORPH_DILATE,kernel)
+    #cv2.namedWindow("BW_zero",cv2.WINDOW_NORMAL)
+    BW_zero= cv2.cvtColor(BW,cv2.COLOR_GRAY2BGR)
+
+    # 1. Find the two Contours for which you want to find the min distance between them.
+    cnts = cv2.findContours(BW, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]#3ms
+    
+    # 2. Keep Only those contours that are not lines 
+    MinArea=(BW.shape[0]/30)*(BW.shape[0]/30)
+    cnts_Legit=[]
+    for index, _ in enumerate(cnts):
+        area = cv2.contourArea(cnts[index])
+        if area > MinArea:
+            cnts_Legit.append(cnts[index])
+    cnts = cnts_Legit
+
+    # Cycle through each point in the Two contours & find the distance between them.
+    # Take the minimum Distance by comparing all other distances & Mark that Points.
+    CntIdx_BstMatch = []# [BstMatchwithCnt0,BstMatchwithCnt1,....]
+    Cnts_clst_dist = []
+    # 3. Connect each contous with its closest 
+    for index, cnt in enumerate(cnts):
+        prevmin_dist = 100000 ; Bstindex_cmp = 0 ; BstCentroid_a=0  ; BstCentroid_b=0      
+        for index_cmp in range(len(cnts)-index):
+            index_cmp = index_cmp + index
+            cnt_cmp = cnts[index_cmp]
+            if (index!=index_cmp):
+                min_dist,Centroid_a,Centroid_b  = ApproxDistBWCntrs(cnt,cnt_cmp)
+
+                #Closests_Pixels=(cnt[min_dstPix_Idx[0]],cnt_cmp[min_dstPix_Idx[1]])
+                if(min_dist < prevmin_dist):
+                    if (len(CntIdx_BstMatch)==0):
+                        prevmin_dist = min_dist
+                        Bstindex_cmp = index_cmp
+                        #BstClosests_Pixels = Closests_Pixels
+                        BstCentroid_a = Centroid_a
+                        BstCentroid_b = Centroid_b   
+
+                    else:
+                        Present= False
+                        for i in range(len(CntIdx_BstMatch)):
+                            if ( (index_cmp == i) and (index == CntIdx_BstMatch[i]) ):
+                                Present= True
+                        if not Present:
+                            prevmin_dist = min_dist
+                            Bstindex_cmp = index_cmp
+                            #BstClosests_Pixels = Closests_Pixels
+                            BstCentroid_a = Centroid_a
+                            BstCentroid_b = Centroid_b
+   
+        if ((prevmin_dist!=100000 ) and (prevmin_dist>MaxDistance)):
+            break
+        if (type(BstCentroid_a)!=int):
+            CntIdx_BstMatch.append(Bstindex_cmp)
+            Cnts_clst_dist.append(prevmin_dist)
+            cv2.line(BW_zero,BstCentroid_a,BstCentroid_b,(0,255,0),thickness=2)
+    
+    BW_gray = cv2.cvtColor(BW_zero,cv2.COLOR_BGR2GRAY)
+
+    # 4. Get estimated midlane by returning the largest contour 
+    BW_Largest,Largest_cnt = RetLargestContour(BW_gray)#3msec
+
+    # 5. Return Estimated Midlane if found otherwise send original
+    if Largest_cnt is not None:
+        return BW_Largest,BW_zero,cnts,CntIdx_BstMatch,Cnts_clst_dist
+    else:
+        return BW,BW_zero,cnts,CntIdx_BstMatch,Cnts_clst_dist
+
+# def connect_closest_blobs(g_plnt_mask,g_plnt_cnts,g_plnt_centroids):
+    
+#     return closest_identified, closest_pairs, closest_dist
+
 # IP Basics
 
 # CV 101
@@ -338,11 +559,13 @@ dark_colors = [RED,GREEN,BLUE,ORANGE,BROWN]
 def draw_points(image,pts,radius=2):
     if len(image.shape)<3:
         image = cv2.cvtColor(image,cv2.COLOR_GRAY2BGR)
+        
+    thickness = 2 if image.shape[0]<1280 else int(2 * (image.shape[0]/640))
     for idx,pt in enumerate(pts):
         if type(pt)!= tuple:
-            pt = tuple(pt)
+            pt = (int(pt[0]),int(pt[1]))
         rand_color = dark_colors[idx]
-        cv2.circle(image,pt,radius,rand_color,2)
+        cv2.circle(image,pt,radius,rand_color,thickness)
     return image
 
 
@@ -700,5 +923,69 @@ def get_data(topic, type = "img", folder_dir = None):
             filenames.append(filename)
     return data_dirs,filenames
 
+def get_iou(bb1, bb2):
+    """
+    Calculate the Intersection over Union (IoU) of two bounding boxes.
 
+    Parameters
+    ----------
+    bb1 : dict
+        Keys: {0, 2, 1, 3}
+        The (0, 1) position is at the top left corner,
+        the (2, 3) position is at the bottom right corner
+    bb2 : dict
+        Keys: {0, 2, 1, 3}
+        The (x, y) position is at the top left corner,
+        the (2, 3) position is at the bottom right corner
+
+    Returns
+    -------
+    float
+        in [0, 1]
+    """
+    assert bb1[0] < bb1[2]
+    assert bb1[1] < bb1[3]
+    assert bb2[0] < bb2[2]
+    assert bb2[1] < bb2[3]
+
+    # determine the coordinates of the intersection rectangle
+    x_left = max(bb1[0], bb2[0])
+    y_top = max(bb1[1], bb2[1])
+    x_right = min(bb1[2], bb2[2])
+    y_bottom = min(bb1[3], bb2[3])
+
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+
+    # The intersection of two axis-aligned bounding boxes is always an
+    # axis-aligned bounding box
+    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+
+    # compute the area of both AABBs
+    bb1_area = (bb1[2] - bb1[0]) * (bb1[3] - bb1[1])
+    bb2_area = (bb2[2] - bb2[0]) * (bb2[3] - bb2[1])
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
+    assert iou >= 0.0
+    assert iou <= 1.0
+    return iou
+
+
+def to_ltrd(ltwh):
+    #  __ _ _ _ _ _  X axis
+    # |     x1  y1
+    # |   (left,top) ---------
+    # |              |       |
+    # |              |       |
+    # |              --------- (right,down)
+    #  Y axis                     x2   y2
+    #           
+    left, top, w, h = ltwh
+    right = left + w
+    down = top + h
+    # Returns (x1, y1, x2  , y2)
+    return ((left,top,right,down))
 # Advanced

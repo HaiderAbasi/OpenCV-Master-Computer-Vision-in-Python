@@ -1,5 +1,47 @@
 import cv2
 from src.utilities import imshow,print_h
+import numpy as np
+
+from loguru import logger
+
+def change_roi_clr(messi_img):
+
+    messi_img_blue_fb = messi_img.copy()
+    # Write Code here... 
+    # Hint (Use SelectROI and trackbar for getting to the desired result) [91,92,96]
+    
+
+    return messi_img_blue_fb
+
+def assignment(debug = True):
+    # Assignment. Turn football from yellow to blue
+    #
+    #
+    # Returns   : (img) Messi-img but now the football has turned blue, With all the beating that it 
+    #                                                                   got from the champion (y)
+    #
+    # Hint      : Selecting the ROI and modifying that might be the key here.
+    if debug:
+        print_h("[Assignment]: Modify img(messi_img) Using trackbar such that yellow football turns blue. Then return this image\n")
+
+
+    # Input
+    messi_img = cv2.imread("Data\messi5.jpg")
+
+    # Task Function
+    messi_img_bluefootball = change_roi_clr(messi_img)
+    
+    if np.array_equal(messi_img_bluefootball,messi_img):
+        logger.error("change_roi_clr() needs to be coded to get the required(messi-img (blue football)) result.\n")
+        exit(0)
+        
+    if debug:
+        # Output (Display)
+        imshow("messi_img (bluefootball)",messi_img_bluefootball)
+        cv2.waitKey(0)
+        
+    return messi_img_bluefootball
+
 
 
 # Track variables for trackbar
@@ -71,6 +113,10 @@ def main():
 
 
 
-
 if __name__=="__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()

@@ -1,11 +1,55 @@
 import cv2
 import numpy as np
 import time
-import os
 import math
+import os
+from loguru import logger
+
 from src.utilities import putText,print_h,disp_fps
 
-from loguru import logger
+
+def assignment():
+    
+    print_h("[Assignment]:  Train a yolo-v7 to a custom dataset(traffic-signs) and use it to detect signs on the test-video.\n")
+    # Use the following dataset or create your own.
+    # \/ Dataset (You can use) \/
+    # https://universe.roboflow.com/new-workspace-vl4lk/dataset-traffic
+    # /\                       /\  
+    
+    # Input Video
+    test_vid_path = "Data\dash_view_3.mp4"
+
+    # Setting path to required files of obj-detection [Model,Weight,Classes]
+    Dataset_dir = "Data/dnn/yolo_v7/traffic-signs"
+    if (os.path.isdir(Dataset_dir)):
+        model_path   = os.path.join(Dataset_dir,"yolov7-tiny_TL.cfg")
+        weights_path = os.path.join(Dataset_dir,"yolov7-tiny_TL_best.weights")
+        classes_path = os.path.join(Dataset_dir,"traffic_signs.names")
+    else:
+        training_in_colab = "https://colab.research.google.com/drive/1ZsbiV62151gw2qwI3pdkqV3nojCx1T6x?usp=sharing#scrollTo=AqQaECSLJ8Yv"
+        logger.error(f"\n\n> Train the yoloV7-tiny using the method described in...\n\n {training_in_colab}\n\n - traffics-sign dataset you will use...\
+                     \n\n    https://universe.roboflow.com/new-workspace-vl4lk/dataset-traffic\n")
+        exit()
+    
+    # Loading the Yolo-v7-tiny trained on a traffic-signs for testing on a video.
+    detection_yolo = Dnn(model_path,weights_path,classes_path,0.4)
+
+    vid = cv2.VideoCapture(test_vid_path)
+    # Object detection in video
+    while(vid.isOpened()):
+        ret,frame = vid.read()
+        
+        if ret:
+            detection_yolo.detect(frame)
+            cv2.imshow('Road-Signs-detection',frame)
+            k=cv2.waitKey(1)
+            if k==27:
+                break
+        else:
+            print("Video Ended")
+            break
+
+
 
 class Dnn:
     
@@ -66,6 +110,8 @@ class Dnn:
         # Stage 2: Removing overlapping region with IOU > threshold in NonMaxSuppression
         indices = cv2.dnn.NMSBoxes(boxes,confidences,conf,0.1)
         
+        det_objs_bboxes = []
+        det_objs_classes = []
         # Draw detected bboxes along with their predicted class + confidence
         if len(indices)>0:
             for i in indices.flatten():
@@ -83,6 +129,11 @@ class Dnn:
                 thickness = math.ceil((min(width,height)*THICKNESS_SCALE))
                 putText(img, text,  org= (x, y - 15),fontScale=font_scale,color=(255,0,255),thickness=thickness)
 
+                det_objs_bboxes.append([x,y,w,h])
+                cls = self.classes[classIDs[i]]
+                det_objs_classes.append(cls)
+                
+        return det_objs_bboxes,det_objs_classes
         
     def detect(self,frame):
                 
@@ -110,13 +161,13 @@ class Dnn:
         outputs = np.vstack(outputs)
         
         # Non-max Suprresion + Drawing predicted bbox and Class
-        self.post_process(frame,outputs, self.conf)
+        pred_bboxes,pred_classes = self.post_process(frame,outputs, self.conf)
         
         # Displaying fps of yolo detections
         disp_fps(frame,start_time)
+        
+        return pred_bboxes,pred_classes
                 
-
-
 
 def main():
 
@@ -126,21 +177,23 @@ def main():
     detection_yolo = Dnn()
     
     # Object detection in video
-    dashcam_street = r"Data\dash_view.webm"
-    vid = cv2.VideoCapture(dashcam_street)
+    vid_path = r"Data\dash_view.webm"
+    vid = cv2.VideoCapture(vid_path)
         
     while(vid.isOpened()):
         ret,frame = vid.read()
         
         if ret:
             detection_yolo.detect(frame)
-            cv2.imshow('Live Obj-det',frame)
+            cv2.imshow('Obj-detection (Yolo-V3)',frame)
             k=cv2.waitKey(1)
             if k==27:
                 break
         else:
             print("Video Ended")
             break
+    
+    cv2.destroyWindow('Obj-detection (Yolo-V3)')
     
     # Using the Yolo-v7-tiny trained on a custom dataset for soccer fans.
     model_path = r"Data\dnn\yolo_v7\football\yolov7-tiny_TL.cfg"
@@ -157,7 +210,7 @@ def main():
         
         if ret:
             detection_yolo.detect(frame)
-            cv2.imshow('Live Obj-det',frame)
+            cv2.imshow('Obj-detection (Yolo-V7-tiny)',frame)
             k=cv2.waitKey(1)
             if k==27:
                 break
@@ -165,6 +218,13 @@ def main():
             print("Video Ended")
             break
 
+
 if __name__=="__main__":
     
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
+    

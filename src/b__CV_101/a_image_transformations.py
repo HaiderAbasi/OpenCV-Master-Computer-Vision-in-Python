@@ -1,7 +1,57 @@
 import cv2
 import numpy as np
 
-from src.utilities import draw_points,print_h,build_montages
+from src.utilities import draw_points,print_h,build_montages,imshow
+from loguru import logger
+
+    
+def get_bookcover(book_in_scne,debug = False):
+    
+    bookcover = book_in_scne.copy()
+    
+    # Hint : Use setmousecallBack() to retrieve points neccesary for computing the transformation matrix
+    # Type code here
+
+    
+    return bookcover
+
+
+def assignment(debug=True):
+    if debug:
+        print_h("[Assignment]: Use transformations and previous knowledge to recover only the book front (no background)\n")
+    # Assignment : Use transformations and previous knowledge to recover only the book front (no background)
+    #
+    # Returns    : (img) Only the bookcover and nothing else.
+    #
+    # Hint       : If something has been distorted, By estimating the amount of distortion and using them
+    #                                               Its effect can be easily reversed.
+    #              Reference: https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html#gaf73673a7e8e18ec6963e3774e6a94b87
+    #                                     =======================================
+    #              You can use the mouseevents to get points in the image that you are interested in
+    #
+    
+    #Input
+    book_img = cv2.imread("Data/book_perspective.jpg")
+    if debug:
+        imshow("book on table",book_img)
+        cv2.waitKey(0)
+        cv2.destroyWindow("book on table")
+
+    # Task Function
+    bookcover = get_bookcover(book_img,debug)
+    
+    
+    if np.array_equal(book_img,bookcover):
+        logger.error("get_bookcover() needs to be coded to get the required(book cover) result.\n")
+        exit(0)
+    
+
+    # Output (Display)
+    if debug:
+        imshow("bookcover",bookcover)
+        cv2.waitKey(0)
+        
+    return bookcover
 
 
 def main():
@@ -79,4 +129,9 @@ def main():
     cv2.waitKey(0)
     
 if __name__ == "__main__":
-    main()
+    i_am_ready = False
+    
+    if i_am_ready:
+        assignment()
+    else:
+        main()
