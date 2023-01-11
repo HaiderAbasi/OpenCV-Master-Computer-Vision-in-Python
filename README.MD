@@ -1,6 +1,6 @@
-# OPENCV4-Master-Computer-Vision-in-Python-
+# Ultimate Computer Vision Course in Python With AI/DeepLearning and OpenCV4
 
-![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/cover.png)
+
 ## Repository contents
 <details open="open">
   <summary>Table of Contents</summary>
@@ -19,14 +19,29 @@
 ## 🤝Repository's About
 ---
 
-This course is your ultimate guide to mastering Computer Vision. Learn & implement everything from basics to advanced using OpenCV4, Dlib and DeepLearning. It is structured with below main headings.
-- Computer Vision Fundamentals
+Jump Start your CV-Career with,
+
+ &nbsp;&nbsp;👍 &nbsp; Complete Computer Vision tools Roundup<br/>
+ &nbsp;&nbsp;👍 &nbsp; Work on DeepLearning Frameworks i.e (Darknet, Pytorch)<br/>
+ &nbsp;&nbsp;👍 &nbsp; 10 Coding Assignments<br/>
+ &nbsp;&nbsp;👍 &nbsp; Unit tests for Evaluation<br/>
+ &nbsp;&nbsp;👍 &nbsp; 1 Final Project End-to-End (Secure Access)<br/>
+ &nbsp;&nbsp;👍 &nbsp; 3 Upcoming Projects<br/>
+
+This course is your ultimate guide to mastering Computer Vision from scratch. Learn & implement everything from basics to advanced using OpenCV4, Dlib and AI/DeepLearning. 
+
+
+![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/cover.png)
+
+It is structured with below main headings.
+- Computer Vision Fundamentals 
 - Image Processing Basics
 - CV-101 
 - Advanced CV 
-- Project: Secure Access - Coming 20th Dec 22-
+- Project: Secure Access
 
 From IP basics to advanced and the final project, We will create everything from scratch. Each topic will be accompanied with an assignment to test your knowledge. Python Object Oriented programming practices will be utilized for better development.
+
 
 ## ⚡ Using this Repository
 ----
