@@ -1,4 +1,3 @@
-from distutils.log import error
 import cv2
 from numpy import random
 import numpy as np
@@ -7,6 +6,8 @@ from loguru import logger
 import sys
 import time
 import os
+from collections import deque
+
 logger.remove()
 logger.add(sink = sys.stderr, level="INFO")
 
@@ -98,7 +99,7 @@ def imshow(img_name,img,image_shape = None,Window_flag = cv2.WINDOW_AUTOSIZE,bou
     cv2.imshow(img_name,img_disp)    
 
 def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(0, 255, 0),thickness=1,color_bg=(0, 0, 0),bbox_size = None):
-    FONT_SCALE = 3e-3  # Adjust for larger font size in all images
+    FONT_SCALE = 2e-3  # Adjust for larger font size in all images
     THICKNESS_SCALE = 2e-3  # Adjust for larger thickness in all images
 
     if fontScale==1:
@@ -541,9 +542,6 @@ def extract_blobs_on_pattern(BW,MaxDistance):
     else:
         return BW,BW_zero,cnts,CntIdx_BstMatch,Cnts_clst_dist
 
-# def connect_closest_blobs(g_plnt_mask,g_plnt_cnts,g_plnt_centroids):
-    
-#     return closest_identified, closest_pairs, closest_dist
 
 # IP Basics
 
@@ -646,6 +644,8 @@ class Gui():
         self.fx,self.fy = -1,-1
         self.roi_confirmed = False
         self.selected_rois = []
+        
+        self.clicked_pt = []
 
 
     # mouse callback function
@@ -688,7 +688,8 @@ class Gui():
             elif k == 27:
                 break
         cv2.destroyAllWindows()
-        #print("selected_rois = ",self.selected_rois)
+        print("selected_rois = ",self.selected_rois)
+        return self.selected_rois
     
     @staticmethod
     def __nothing(val):
@@ -771,8 +772,6 @@ class Gui():
 
     # ADVANCED #
 
-
-
     def ret_point(self,event,x,y, flags, param):
         # checking for left mouse clicks
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -819,6 +818,29 @@ class Gui():
             if k==27:
                 logger.warning("(Esc key pressed) --> No contours selected + Exiting!!!")
                 return -1,-1 # idx = -1 (indicating no contour and exiting!)
+
+    def __save_clicked_point(self,event, x, y, flags, param):
+        """
+        Saves the coordinates of the point where the user clicked.
+        
+        Parameters:
+        event (int): Event type, such as mouse button release
+        x (int): X-coordinate of the clicked point
+        y (int): Y-coordinate of the clicked point
+        flags (int): Additional parameters for the event, unused
+        param (list): List to store the clicked point, updated in-place
+        
+        Returns:
+        None
+        """
+        if event == cv2.EVENT_LBUTTONDOWN:
+            #print(f"User clicked on ({x},{y})")
+            self.clicked_pt.append((x, y))
+
+    def select_pt(self,Window_Name ="Point Selection"):
+        cv2.namedWindow(Window_Name,cv2.WINDOW_NORMAL)
+        cv2.setMouseCallback(Window_Name, self.__save_clicked_point)
+
 
 
 def noisy(noise_typ,image):
@@ -878,6 +900,9 @@ def noisy(noise_typ,image):
 
 # Advanced
 
+def random_bright_color():
+    return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
 def disp_fps(frame,start_time):
 
     FONT_SCALE = 3e-3
@@ -890,6 +915,15 @@ def disp_fps(frame,start_time):
 
     fps_txt = f"FPS: = {1.0 / (time.time() - start_time):.2f}"
     putText(frame, fps_txt, org=(10, 20),fontScale=font_scale)
+    
+def disp_Fps(frame,processing_times,start_frame_time,clr = (0,255,0)):
+    end_frame_time = time.perf_counter()
+    processing_times.append(end_frame_time - start_frame_time)
+    # Calculate the average processing time
+    average_processing_time = sum(processing_times) / processing_times.maxlen
+    # Calculate the FPS
+    fps_txt = "FPS: {:.2f}".format(1/average_processing_time)
+    putText(frame, f"{fps_txt}",(20,20),color=clr)
 
 
 def get_fileName(file_path):
@@ -905,10 +939,13 @@ def get_data(topic, type = "img", folder_dir = None):
 
     if folder_dir==None:
         if topic =="tracking":
-            folder_dir = "Data/NonFree/Advanced/Tracking/test_videos"
+            folder_dir = "Data/Advanced/Tracking/test_videos"
             fomrats = (".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm")
         elif topic =="multitracking":
-            folder_dir = "Data/NonFree/Advanced/Tracking/multi_test_videos"
+            folder_dir = "Data/Advanced/Tracking/multi_test_videos"
+            fomrats = (".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm")
+        elif topic =="deepsort":
+            folder_dir = "Data/Advanced/Tracking/deepsort"
             fomrats = (".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm")
 
 
@@ -988,4 +1025,104 @@ def to_ltrd(ltwh):
     down = top + h
     # Returns (x1, y1, x2  , y2)
     return ((left,top,right,down))
+
+
+# DeepSort Additions 
+def generate_vibrant_color():
+    
+    def hsv_to_rgb(h, s, v):
+        c = v * s
+        x = c * (1 - abs((h * 6) % 2 - 1))
+        m = v - c
+        if h < 1/6:
+            r, g, b = c + m, x + m, 0 + m
+        elif h < 2/6:
+            r, g, b = x + m, c + m, 0 + m
+        elif h < 3/6:
+            r, g, b = 0 + m, c + m, x + m
+        elif h < 4/6:
+            r, g, b = 0 + m, x + m, c + m
+        elif h < 5/6:
+            r, g, b = x + m, 0 + m, c + m
+        else:
+            r, g, b = c + m, 0 + m, x + m
+        return int(r * 255), int(g * 255), int(b * 255)
+
+    h = random.uniform(0, 1)
+    s = random.uniform(0.8, 1)
+    v = random.uniform(0.8, 1)
+    vibrant_clr = hsv_to_rgb(h,s,v)
+    return vibrant_clr
+
+def find_centroid(bbox,bbox_type = "ltrd"):
+    """
+    This function computes the centroid of a bounding box given its coordinates in ltrd format.
+
+    Parameters:
+    bbox (tuple): A tuple of 4 values (x1, y1, x2, y2) that define the bounding box coordinates.
+    bbox_type (str, optional): The type of bounding box, default is "ltrd".
+
+    Returns:
+    tuple: A tuple of 2 values (x_center, y_center) representing the x and y coordinates of the centroid.
+
+    Raises:
+    ValueError: If an unsupported bounding box type is provided.
+    """
+    if (bbox_type == "ltrd"):
+        x1, y1, x2, y2 = bbox
+        x_center = (x1 + x2) / 2
+        y_center = (y1 + y2) / 2
+        return (int(x_center), int(y_center))
+    else:
+        print("[Unsupported bbox_type]: Please provide a 'ltrd' bbox!")
+        return (0,0)
+
+def closest_bbox_to_pt(point, bboxes):
+    """
+    - Finds the closest bounding box center to a given point.
+
+    Parameters:
+    point (tuple): A 2D point represented as (x, y)
+    bboxes (list): List of bounding boxes represented as [(x1, y1, x2, y2), ...]
+
+    Returns:
+    tuple: The closest bounding box represented as (x1, y1, x2, y2) and its index.
+
+    """
+    # Calculate center of bounding boxes
+    bbox_centers = [(bbox[:2] + (bbox[2:] - bbox[:2]) / 2) for bbox in bboxes]
+    # Calculate distances between point and bounding box centers
+    distances = [np.linalg.norm(point - bbox_center) for bbox_center in bbox_centers]
+    # Find index of closest bounding box center
+    closest_idx = np.argmin(distances)
+    # Return the closest bounding box and its index
+    return bboxes[closest_idx], closest_idx
+
+def add_to_dict_deque(d, key, value,dq_len = 2):
+    """
+    - Append to dictionary of deques if a key already exists 
+      
+        OR 
+    
+        Add a new element deque(length) at location key
+
+    Parameters:
+    d (dict): The dictionary where the deque is stored.
+    key (hashable): The key under which the deque is stored.
+    value (Any): The value to be added to the deque.
+
+    Returns:
+    None
+    """
+    # check if the key is already present in the dictionary
+    if key in d:
+        # if yes, append the value to the deque
+        d[key].append(value)
+    else:
+        # if not, create a new deque with length 2 and store it in the dictionary
+        d[key] = deque([value], maxlen=dq_len)
+
+
+# DeepSort Additions 
+
 # Advanced
