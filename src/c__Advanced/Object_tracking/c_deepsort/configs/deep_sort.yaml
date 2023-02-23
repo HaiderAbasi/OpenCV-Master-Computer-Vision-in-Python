@@ -1,0 +1,21 @@
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    DeepSort Members    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# embedder_path (str) : Reidentification feature extractor (CNN)
+# max_cosine_distance (float) :  Gating threshold for cosine distance
+# min_confidence_tracking (float): Minimum confidence required to be available for tracking
+# nms_max_overlap (float) : Overlap more then this theshold wil be suppressed
+# max_iou_distance (float) : Gating threshold on IoU. Associations with cost larger than this value are disregarded.
+# max_age (int) : Maximum number of missed misses before a track is deleted. Argument for deep_sort_realtime.deep_sort.tracker.Tracker.
+# n_init (int) : Number of frames that a track remains in initialization phase. Defaults to 3. Argument for deep_sort_realtime.deep_sort.tracker.Tracker.
+# nn_budget (int) : Maximum size of the appearance descriptors, if None, no budget is enforced
+
+DEEPSORT:
+  REID_CKPT: "deep_sort/deep/checkpoint/ckpt.t7"
+  MAX_DIST: 0.2
+  MIN_CONFIDENCE: 0.3
+  NMS_MAX_OVERLAP: 0.7
+  MAX_IOU_DISTANCE: 0.7
+  MAX_AGE: 70
+  N_INIT: 3
+  NN_BUDGET: 100
+  
