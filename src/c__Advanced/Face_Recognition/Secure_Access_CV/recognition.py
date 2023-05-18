@@ -63,9 +63,9 @@ class face_recognition_dlib():
             foldername = os.path.basename(dataset_dir)
             embeddings_path = os.path.join(os.path.dirname(__file__),f"models/{foldername}-live_embeddings-face_enc")
             if not os.path.isfile(embeddings_path): # Only generate if not already present
-                self.generate_embeddings(dataset_dir,True)
+                self.generate_embeddings(dataset_dir,False)
             # load the known faces and embeddings saved in last file
-            data = pickle.loads(open(self.default_embeddings_path, "rb").read())
+            data = pickle.loads(open(embeddings_path, "rb").read())
         elif os.path.isfile(self.default_embeddings_path):
             # load the known faces and embeddings saved in last file
             data = pickle.loads(open(self.default_embeddings_path, "rb").read())

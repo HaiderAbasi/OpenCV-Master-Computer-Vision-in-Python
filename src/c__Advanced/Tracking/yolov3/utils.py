@@ -126,8 +126,39 @@ def image_preprocess(image, target_size, gt_boxes=None):
         gt_boxes[:, [1, 3]] = gt_boxes[:, [1, 3]] * scale + dh
         return image_paded, gt_boxes
 
+def postprocess_preds(image,pred_bbox,NUM_CLASS ,Track_only = []):
+    # Reshape detector predicted bboxes
+    pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+    # Concatenate the reshaped bboxes into a single tensor
+    pred_bbox = tf.concat(pred_bbox, axis=0)
 
-def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,0), rectangle_colors='', tracking=False):   
+    score_threshold=0.3;iou_threshold=0.1
+    bboxes = postprocess_boxes(pred_bbox, image, YOLO_INPUT_SIZE, score_threshold) # Some sort of processing
+    bboxes = nms(bboxes, iou_threshold, method='nms') # Performing non-maximum suppression
+    # extract bboxes to bbs = [detection = (boxes (x, y, width, height), scores and names)]
+    bbs = []
+    for bbox in bboxes:
+        if len(Track_only) !=0 and NUM_CLASS[int(bbox[5])] in Track_only or len(Track_only) == 0:
+            box = ([bbox[0].astype(int), bbox[1].astype(int), bbox[2].astype(int)-bbox[0].astype(int), bbox[3].astype(int)-bbox[1].astype(int)])
+            score = bbox[4]
+            name = NUM_CLASS[int(bbox[5])]
+            bbs.append((box,score,name))
+            
+    return bbs
+
+def overlay_on_image(image,clr_trails):
+    h, w = clr_trails.shape[:2]
+    overlay = np.zeros((h, w, 3), dtype=np.uint8)
+    
+    gray = cv2.cvtColor(clr_trails,cv2.COLOR_BGR2GRAY)
+    mask = cv2.threshold(gray,0,255,cv2.THRESH_BINARY)[1]
+    inverted_mask = cv2.bitwise_not(mask)
+    image = cv2.bitwise_and(image, image, mask=inverted_mask)
+    overlay = cv2.bitwise_and(clr_trails, clr_trails, mask=mask)
+    image = cv2.bitwise_or(overlay, image)
+    return image
+
+def draw_bbox(image, bboxes,mask = None, trajectories = None,tracked_clr = None, ID_to_track =None ,CLASSES=YOLO_COCO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,0), rectangle_colors='', tracking=False):   
     NUM_CLASS = read_class_names(CLASSES)
     num_classes = len(NUM_CLASS)
     image_h, image_w, _ = image.shape
@@ -139,20 +170,33 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
     random.seed(0)
     random.shuffle(colors)
     random.seed(None)
-
+       
+        
     for i, bbox in enumerate(bboxes):
         coor = np.array(bbox[:4], dtype=np.int32)
         score = bbox[4]
         class_ind = int(bbox[5])
-        bbox_color = rectangle_colors if rectangle_colors != '' else colors[class_ind]
-        bbox_thick = int(0.6 * (image_h + image_w) / 1000)
+        if ID_to_track and score == ID_to_track:
+            bbox_color = (0,255,0)
+            Text_colors = (255,0,0)
+        elif ID_to_track:
+            temp_color = rectangle_colors if rectangle_colors != '' else colors[class_ind]
+            b,g,r = temp_color
+            bbox_color = (int(b*0.3),int(g*0.3),int(r*0.3)) 
+            Text_colors = (80,80,80)
+        else:
+            #continue
+            bbox_color = rectangle_colors if rectangle_colors != '' else colors[class_ind]
+        
+        bbox_thick = int(0.6 * (image_h + image_w) / 1000) 
         if bbox_thick < 1: bbox_thick = 1
         fontScale = 0.75 * bbox_thick
         (x1, y1), (x2, y2) = (coor[0], coor[1]), (coor[2], coor[3])
-
+   
         # put object rectangle
         cv2.rectangle(image, (x1, y1), (x2, y2), bbox_color, bbox_thick*2)
-
+        if len(trajectories[score])==2:
+            cv2.line(mask, trajectories[score][0], trajectories[score][1], tracked_clr[score], 2)
         if show_label:
             # get text label
             
@@ -164,7 +208,8 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             if tracking: score_str = " "+str(score)
 
             try:
-                label = "{}".format(NUM_CLASS[class_ind]) + score_str
+                #label = "{}".format(NUM_CLASS[class_ind]) + score_str
+                label = score_str
             except KeyError:
                 print("You received KeyError, this might be that you are trying to use yolo original weights")
                 print("while using custom classes, if using custom model in configs.py set YOLO_CUSTOM_WEIGHTS = True")
@@ -178,6 +223,7 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             # put text above rectangle
             cv2.putText(image, label, (x1, y1-4), cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale, Text_colors, bbox_thick, lineType=cv2.LINE_AA)
+            image = overlay_on_image(image,mask)
 
     return image
 
@@ -270,6 +316,9 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
 
     # 4. discard some invalid boxes
     bboxes_scale = np.sqrt(np.multiply.reduce(pred_coor[:, 2:4] - pred_coor[:, 0:2], axis=-1))
+    # reject boxes that are greater than 70% of the average bounding box size,
+    avg_bbox_scale = np.mean(bboxes_scale)
+    valid_scale = [0, avg_bbox_scale * 1.7]    
     scale_mask = np.logical_and((valid_scale[0] < bboxes_scale), (bboxes_scale < valid_scale[1]))
 
     # 5. discard boxes with low scores

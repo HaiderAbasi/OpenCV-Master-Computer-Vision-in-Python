@@ -34,6 +34,8 @@ class face_recognition_dlib(face_recognition_dlib):
             
             # the facial embeddings for face in input
             encodings = face_recognition.face_encodings(rgb)
+            print(f"encoding.shape = {len(encodings[0])}")
+            cv2.waitKey(0)
             names = []
             # loop over the facial embeddings incase
             # we have multiple embeddings for multiple fcaes

@@ -1,6 +1,4 @@
 
-
-
 # Chrome Bookmarks
 
 # Advanced_Detection_+_DockerSetup

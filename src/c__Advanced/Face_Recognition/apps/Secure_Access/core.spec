@@ -11,11 +11,11 @@ models = [
 ('.\\models\\shape_predictor_68_face_landmarks.dat', './face_recognition_models/models'),
 ('.\\models\\haarcascade_frontalface_alt_tree.xml', './models'),
 ('.\\models\\live_embeddings-face_enc', './models'),
-('.\\models\\Mr haider-live_embeddings-face_enc', './models'),
+('.\\models\\authorized_personnels-live_embeddings-face_enc', './models'),
 ]
 
 a = Analysis(
-    ['core.py'],
+    ['core_v4.py'],
     pathex=[],
     binaries=models,
     datas=[],
@@ -41,7 +41,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

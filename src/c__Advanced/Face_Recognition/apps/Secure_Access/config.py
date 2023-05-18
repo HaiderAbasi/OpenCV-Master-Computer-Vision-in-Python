@@ -7,6 +7,7 @@ nvidia_gpu = False
 vid_id = None
 
 # Debugging controls
+display = False
 debug = True
 display_state = False
 

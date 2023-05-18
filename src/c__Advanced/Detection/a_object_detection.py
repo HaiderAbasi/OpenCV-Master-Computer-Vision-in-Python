@@ -13,7 +13,7 @@ def assignment():
 	print_h("[Assignment]:  Train a yolo-v5 or v7 to a custom dataset and use it for a specific use-case here.\n")
 	
 	# Input Video
-	dashcam_street = "Data/NonFree\dash_view.webm"
+	dashcam_street = "Data/NonFree/dash_view.webm"
 
 	# Creating instance of yolo v5 trained by you for obj detection in the given test video
 	method = "yolo_v5"
@@ -241,7 +241,7 @@ class Detection:
 			self.detector = Dnn(model_path,weights_path,classes_path,conf)
 		else:
 			logger.error(f"Unknown method specified ({method})")
-			logger.opt(colors=True).info("<green>[Solution]:</green> Check Spelling OR Check if [<blue>model_path</blue>] and [<blue>model_weight</blue>] are correctly specified.")
+			logger.opt(colors=True).info("<green>[Solution]:</green> Check Spelling <red>or</red> Check if [<blue>model_path</blue>] and [<blue>model_weight</blue>] are correctly specified.")
 
 		self.method = method # Store selected method as an instance variable of class
 
@@ -257,7 +257,7 @@ class Detection:
 				filename, ext = os.path.splitext(vid_path)
 				vid_fomrats = [".mp4", ".avi", ".mov", ".mpeg", ".flv", ".wmv",".webm"]
 				if ext in vid_fomrats:
-					self.detector.detect_in_video(vid_path,True)
+					self.detector.detect_in_video(vid_path,False)
 				else:
 					logger.error(f"Unknown vid path ({vid_path})")
 					exit(0)
@@ -317,8 +317,6 @@ def main():
 	#model_path = r"Data\NonFree\dnn\yolo_v7\yolov7.cfg"
 	#weights_path = r"Data\NonFree\dnn\yolo_v7\yolov7.weights"
 
-	#model_path = r"Data\NonFree\dnn\yolo_v3\yolov3.cfg"
-	#weights_path = r"Data\NonFree\dnn\yolo_v3\darknet53.conv.74"
 
 	detection_yolo = Detection("yolo",model_path,weights_path,classes_path,conf = 0.45)
 	test_yolo_in_video = True

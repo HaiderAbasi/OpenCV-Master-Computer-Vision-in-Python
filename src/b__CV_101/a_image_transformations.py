@@ -26,7 +26,7 @@ def assignment():
 
 	# Task Function
 	bookcover = get_bookcover(book_img)
-	if (book_img==bookcover).all():
+	if np.array_equal(book_img,bookcover):
 		logger.warning("get_bookcover() needs to be coded to get the required(book cover) result.")
 		exit(0)
 

@@ -210,13 +210,10 @@ def demo():
     secure_acc = secure_access_cv()
 
     #test_vid_path = r"Data\NonFree\Friends\Avengers_endgame_Assemble.mp4"
-    #test_vid_path = r"Data\NonFree\Friends\Jeff_Vs_Elon.mp4"
-    #test_vid_path = r"Data\NonFree\Friends\Friends_AllClothes.mp4"
-    test_vid_path = r"Data\NonFree\Friends\Friends_lightning round.mp4"
+    test_vid_path = r"Data\NonFree\Friends\Friends_AllClothes.mp4"
 
-    #dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\avengers_endgame"
-    #dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\known_people"
-    dataset_dir = r"src/c__Advanced\Face_Recognition\training-data\dlib\friends"
+    #dataset_dir = r"src/c__Advanced\Face_Recognition\data/training-data\dlib\avengers_endgame"
+    dataset_dir = r"src/c__Advanced\Face_Recognition\data/training-data\dlib\friends"
 
     secure_acc.activate_sa(test_vid_path,dataset_dir= dataset_dir)
 

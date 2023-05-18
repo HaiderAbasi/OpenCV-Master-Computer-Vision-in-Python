@@ -1,7 +1,5 @@
 import cv2
-import numpy as np
-import os
-from src.a__IP_Basics.utilities import imshow,describe,putText,get_data,debugger,get_fileName,print_h
+from src.a__IP_Basics.utilities import putText,get_data,debugger,get_fileName,print_h
 import time
 
 
@@ -58,9 +56,9 @@ def main():
     tracker = Tracking(tracker_type)
 
 
-    Friends = "Data/NonFree\Friends\Friends_AllClothes.mp4"
-    Megamind = "Data/NonFree/Megamind.avi"
-    Window_Name = get_fileName(Megamind)
+    # Friends = "Data/NonFree\Friends\Friends_AllClothes.mp4"
+    # Megamind = "Data/NonFree/Megamind.avi"
+    # Window_Name = get_fileName(Megamind)
 
     vid_dirs,filenames = get_data("tracking")
     data_iter = int(input("Please select one from the following:\n"+"\n".join(filenames)+"\n"))

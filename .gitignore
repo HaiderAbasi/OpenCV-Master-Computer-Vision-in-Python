@@ -23,6 +23,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 Data/
+src/c__Advanced/Tracking/Deepsort_venv
 src/c__Advanced/Tracking/model_data
 src/c__Advanced/Face_Recognition/apps/Secure_Access/models
 src/c__Advanced/Face_Recognition/apps/Secure_Access/authorized_personnels/taha/

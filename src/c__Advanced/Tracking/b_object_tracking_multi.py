@@ -1,7 +1,6 @@
 import cv2
 from src.a__IP_Basics.utilities import putText,get_data,get_fileName,Gui,print_h
 import time
-from random import randint
 
 
 
@@ -124,7 +123,7 @@ def demo():
         print('--(!)Error opening video capture')
         exit(0)
 
-
+    cv2.namedWindow(Window_Name,cv2.WINDOW_NORMAL)
     while True:
         #debugger.update_variables() # Get updated variables
         #data_iter = debugger.debug_vars[0]

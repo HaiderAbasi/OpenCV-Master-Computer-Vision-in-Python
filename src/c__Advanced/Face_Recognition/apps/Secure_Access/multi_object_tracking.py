@@ -52,13 +52,21 @@ class multitracker:
 
             # Draw bounding box
             # draw tracked objects
+            Grant_access = False
             if success:
                 for i, newbox in enumerate(boxes):
                     p1 = (int(newbox[0]), int(newbox[1]))
                     # p2 = (left        +  width    ,   top         +  height  )
                     p2 = (int(newbox[0] + newbox[2]), int(newbox[1] + newbox[3])) 
                     cv2.rectangle(frame_draw, p1, p2, self.colors[i], 3, 1)
-                    cv2.putText(frame_draw,f"{self.obj_type}_{self.Tracked_classes[i]}",(p1[0],p1[1]-20),cv2.FONT_HERSHEY_DUPLEX,1,(128,0,255))
+                    #cv2.putText(frame_draw,f"{self.obj_type}_{self.Tracked_classes[i]}",(p1[0],p1[1]-20),cv2.FONT_HERSHEY_DUPLEX,1,(128,0,255))
+                    cv2.putText(frame_draw,f"{self.Tracked_classes[i]}",(p1[0],p1[1]-20),cv2.FONT_HERSHEY_DUPLEX,1.0,(128,0,255),2)
+                    if self.colors[i] == (0,255,0):
+                        Grant_access = True
+                        
+                if Grant_access:    
+                    cv2.putText(frame_draw,f">>> Access granted <<<",(int(frame_draw.shape[1]/2)-120,25),cv2.FONT_HERSHEY_DUPLEX,0.7,(0,128,0),2)
+
             else:
                 self.mode = "Detection"
                 if draw:

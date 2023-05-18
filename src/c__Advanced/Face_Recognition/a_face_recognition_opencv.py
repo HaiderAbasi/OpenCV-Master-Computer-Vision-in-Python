@@ -2,7 +2,7 @@
 import cv2
 import os
 import numpy as np
-from src.c__Advanced.Detection.a_object_detection import detection
+from src.c__Advanced.Detection.a_object_detection import Detection
 from src.c__Advanced.utilities import draw_rectangle, imshow,putText,GUI
 import time
 
@@ -15,16 +15,19 @@ class face_recognition_cv:
         if face_recognizer == "eigen":
             self.recognizer = cv2.face.createEigenFaceRecognizer()
         elif face_recognizer == "fisher":
-            self.recognizer = cv2.face.createFisherFaceRecognizer()
+            self.recognizer = cv2.face.FisherFaceRecognizer_create()
         elif face_recognizer == "lpbh":
             self.recognizer = cv2.face.LBPHFaceRecognizer_create()
         else:
             print(f"Unknown face recognizer specified {face_recognizer}. Exiting....")
             exit(0)
+            
+        self.face_w = 100
+        self.face_h = 100
 
         self.known_indivdiuals = []
         self.__train_dir = r"src/c__Advanced\Face_Recognition\training-data\cv\Friends"
-        self.__face_detector = detection() # Creating instance of cascade detector
+        self.__face_detector = Detection() # Creating instance of cascade detector
 
     def extract_trainingdata(self,vid_dir,sort = False):
         folder_name = os.path.basename(os.path.dirname(vid_dir))
@@ -139,8 +142,11 @@ class face_recognition_cv:
                     if detect_face:
                         #detect face
                         bboxes = self.__face_detector.detect(image)
-                        (x,y,w,h) = bboxes[0]
-                        face = gray[y:y+h,x:x+w]
+                        if len(bboxes)==0:
+                            face = None
+                        else:
+                            (x,y,w,h) = bboxes[0]
+                            face = gray[y:y+h,x:x+w]
                     else:
                         face = gray
                     #cv2.imshow("face",face)
@@ -149,6 +155,8 @@ class face_recognition_cv:
                     #we will ignore faces that are not detected
                     if face is not None:
                         #add face to list of faces
+                        face = cv2.resize(face, (self.face_w, self.face_h))
+
                         faces.append(face)
                         #add label for this face
                         labels.append(label)
@@ -286,6 +294,7 @@ class face_recognition_cv:
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
             face = gray[y:y+h,x:x+w]
             cv2.imshow("face",face)
+            face = cv2.resize(face, (self.face_w, self.face_h))
 
             #predict the image using our face recognizer 
             label, confidence = self.recognizer.predict(face)
@@ -316,8 +325,11 @@ def demo():
 
     if perform_recognition:
         #perform a prediction
+        start = time.time()
         predicted_img1,label_1 = face_recognizer.predict(test_img1)
         predicted_img2,label_2 = face_recognizer.predict(test_img2)
+        time_elapsed = time.time() - start
+        print(f"Time took to predict {time_elapsed}.ms")
         #display both images
         imshow(label_1, cv2.resize(predicted_img1, (400, 500)),cv2.WINDOW_AUTOSIZE)
         imshow(label_2, cv2.resize(predicted_img2, (400, 500)),cv2.WINDOW_AUTOSIZE)
@@ -329,7 +341,7 @@ def main():
 
     face_recognizer = face_recognition_cv()
 
-    train_recognizer = True
+    train_recognizer = False
     perform_recognition = True
 
     train_video = r"Data\NonFree\Friends\Friends_lightning round.mp4"
@@ -361,10 +373,10 @@ def main():
                 fps_txt = f"FPS: = {fps:.2f}"
                 putText(predicted_img, f"{fps_txt}",(20,20))
                 #display both images
-                imshow("Face Recognition", cv2.resize(predicted_img, (400, 500)),cv2.WINDOW_AUTOSIZE)
+                imshow("Face Recognition", cv2.resize(predicted_img, (400, 500)),cv2.WINDOW_NORMAL)
                 cv2.waitKey(1)
         
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    main()
+    demo()

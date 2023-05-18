@@ -35,7 +35,7 @@ class face_recognition_dlib():
         knownNames = []
         # loop over the image paths
         for (i, imagePath) in enumerate(imagePaths):
-            # extract the person name from the image path
+            # extract the person name from the image path (folder name)
             name = imagePath.split(os.path.sep)[-2]
             # load the input image and convert it from BGR (OpenCV ordering)
             # to dlib ordering (RGB)

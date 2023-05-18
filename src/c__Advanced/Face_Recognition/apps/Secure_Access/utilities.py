@@ -793,3 +793,34 @@ def putText_bbox(img,text_list,orig_list,type = "bbox"):
 
         #cv2.putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,fontScale,clr,4 )
         putText(img,txt,org,cv2.FONT_HERSHEY_PLAIN,1,clr,1 )
+
+
+def draw_fancy_bbox(img, pt1, pt2, color, thickness, r, d):
+    x1, y1 = pt1
+    x2, y2 = pt2
+    xr, yr = x1 + r, y1 + r
+    xl, yl = x2 - r, y2 - r
+
+    # Top left
+    xrd, yrd = xr + d, yr + d
+    cv2.line(img, (xr, y1), (xrd, y1), color, thickness)
+    cv2.line(img, (x1, yr), (x1, yrd), color, thickness)
+    cv2.ellipse(img, (xr, yr), (r, r), 180, 0, 90, color, thickness)
+
+    # Top right
+    xld, yrd = xl - d, yr + d
+    cv2.line(img, (xl, y1), (xld, y1), color, thickness)
+    cv2.line(img, (x2, yr), (x2, yrd), color, thickness)
+    cv2.ellipse(img, (xl, yr), (r, r), 270, 0, 90, color, thickness)
+
+    # Bottom left
+    xrd, yld = xr + d, yl - d
+    cv2.line(img, (xr, y2), (xrd, y2), color, thickness)
+    cv2.line(img, (x1, yl), (x1, yld), color, thickness)
+    cv2.ellipse(img, (xr, yl), (r, r), 90, 0, 90, color, thickness)
+
+    # Bottom right
+    xld, yld = xl - d, yl - d
+    cv2.line(img, (xl, y2), (xld, y2), color, thickness)
+    cv2.line(img, (x2, yl), (x2, yld), color, thickness)
+    cv2.ellipse(img, (xl, yl), (r, r), 0, 0, 90, color, thickness)

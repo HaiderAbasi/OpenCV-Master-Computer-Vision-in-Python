@@ -16,6 +16,7 @@ from utilities import putText,get_iou,to_ltrd,to_ltwh
 from multiprocessing import active_children
 import sys
 from os import path
+import ctypes
 
 import argparse
 
@@ -26,11 +27,47 @@ import config
 
 import subprocess
 
+def drawline(img,pt1,pt2,color,thickness=1,style='dotted',gap=20):
+    dist =((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2)**.5
+    pts= []
+    for i in  np.arange(0,dist,gap):
+        r=i/dist
+        x=int((pt1[0]*(1-r)+pt2[0]*r)+.5)
+        y=int((pt1[1]*(1-r)+pt2[1]*r)+.5)
+        p = (x,y)
+        pts.append(p)
+
+    if style=='dotted':
+        for p in pts:
+            cv2.circle(img,p,thickness,color,-1)
+    else:
+        s=pts[0]
+        e=pts[0]
+        i=0
+        for p in pts:
+            s=e
+            e=p
+            if i%2==1:
+                cv2.line(img,s,e,color,thickness)
+            i+=1
+
+def drawpoly(img,pts,color,thickness=1,style='dotted',):
+    s=pts[0]
+    e=pts[0]
+    pts.append(pts.pop(0))
+    for p in pts:
+        s=e
+        e=p
+        drawline(img,s,e,color,thickness,style)
+
+def drawrect(img,pt1,pt2,color,thickness=1,style='dotted'):
+    pts = [pt1,(pt2[0],pt1[1]),pt2,(pt1[0],pt2[1])] 
+    drawpoly(img,pts,color,thickness,style)
+
 
 class secure_access_cv:
 
     def __init__(self):
-                
         # [1: Face Detector] Loading cascade classifier as the fastest face detector in OpenCV
         self.faceCascade = cv2.CascadeClassifier()
         if not self.faceCascade.load(path.join(path.dirname(__file__),config.cascPathface)):
@@ -51,12 +88,39 @@ class secure_access_cv:
 
         self.currently_recognizing = "Single"# 1: Single, Multiple, Appended
         
+        self.invoke_screenlock = False
+        self.max_wait = 50
+        self.lock_iter = 0
+        
     def update_state(self,frame):
+        """
+        Update the state of the video processing based on the input frame.
+
+        Args:
+            frame: The input frame to process.
+
+        Returns:
+            The wait time in milliseconds before processing the next frame.
+
+        The method calculates the processing time of the frame and decides whether to wait for a minimum possible time or for a calculated time based on the elapsed time. It then calculates the frames per second (FPS) of the processing and updates a rolling average of the FPS using a queue. It displays the FPS and wait time on the image frame using OpenCV's cv2.putText function.
+
+        If `config.display_state` is set to True, it also displays the face detector and tracking mode used in the processing.
+        """
         ideal_processing_time = 28 # ms [Considering 30 fps]
         if self.elapsed_time < ideal_processing_time:
             waitTime = ceil(ideal_processing_time - self.elapsed_time)
         else: # Already too slow --> Wait for minimum possible time
             waitTime = 1
+        
+        elapsed_time_sec = (self.elapsed_time)/1000
+        fps = 1.0 / elapsed_time_sec if elapsed_time_sec!=0 else 100.00
+        # Rolling average applied to get average fps estimation
+        self.fps_queue.append(fps)
+        fps = (sum(self.fps_queue)/len(self.fps_queue))
+        #fps_txt = f"{self.tracker.mode}: ( {self.tracker.tracker_type} ) at {fps:.2f} FPS"
+        fps_txt = f"{fps:.2f} FPS"
+        cv2.putText(frame, fps_txt ,(20,30) ,cv2.FONT_HERSHEY_DUPLEX, 0.5, (255,0,0))
+
         
         if config.display_state:
             elapsed_time_sec = (self.elapsed_time)/1000
@@ -104,16 +168,32 @@ class secure_access_cv:
                     self.m_tracker.Tracked_classes[iter] = name
                     if name!= "Unknown":
                         self.m_tracker.colors[iter] = (0,255,0)
+                        self.invoke_screenlock = False
                     else:
                         self.m_tracker.colors[iter] = (0,0,255)
+                        
+                if len(face_names)==1:
+                    if ( (face_names[0] == "Unknown") and (not self.invoke_screenlock) ):
+                        self.invoke_screenlock = True
+                        self.lock_iter = 0
 
-    def activate_sa(self,vid_id,dataset_dir =""):
+    def activate_sa(self,vid_id,dataset_dir =""):   
+        """
+        Activates secure access by starting face recognition and tracking on the video feed.
+        
+        Args:
+        vid_id: The id of the camera/webcam device to capture frames from or the path of the video file to use.
+        dataset_dir: The path to the directory containing the images to use for training the face recognition model.
+        
+        """
         print("Activating Secure Access....\n Authorized personnel only!")
         config.vid_id = vid_id
         
         # Get embeddings [encodings + Names]
         data = self.face_recog.get_embeddings(dataset_dir)
-
+        # print("data = ",data)
+        # cv2.waitKey(0)
+        
         if config.ignore_Warning_MMSF or isinstance(vid_id, str):
             # Debugging on a stored video...
             cap = cv2.VideoCapture(vid_id)
@@ -255,6 +335,31 @@ class secure_access_cv:
                 children = active_children()
                 cv2.putText(frame_draw,f"Recognizing {self.currently_recognizing} face/es  with {len(children)} subprocess running!", ( 20,200 ) ,cv2.FONT_HERSHEY_DUPLEX, 1, (128,128,128))
                 cv2.putText(frame_draw, f"Processing took  = {self.elapsed_time:.2f} ms" ,(20,120) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,128))
+                
+            if self.invoke_screenlock:
+                s=(5,5)
+                e=(frame_draw.shape[1]-5,frame_draw.shape[0]-5)
+                drawrect(frame_draw,s,e,(0,0,255),4,'dotted')
+                cv2.putText(frame_draw,f">>> Unauthorized access <<<",(int(frame_draw.shape[1]/2)-155,30),cv2.FONT_HERSHEY_DUPLEX,0.7,(128,0,128),2)
+                #cv2.putText(frame_draw, f"Unauthorized access!" ,(20,40) ,cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,255))
+                cv2.putText(frame_draw, f"Locking in {self.max_wait-self.lock_iter} s" ,(20,60) ,cv2.FONT_HERSHEY_DUPLEX, 1, (128,0,255))
+                self.lock_iter = self.lock_iter + 1
+                
+                r,c = frame_draw.shape[0:2]
+                r_s = int(r*0.2)
+                r_e = r - r_s
+                
+                t_elpsd_p = 1 - ((self.max_wait - self.lock_iter)/self.max_wait)
+                r_ln = r_e - r_s
+                
+                cv2.rectangle(frame_draw,(50,r_s),(80,r_e),(0,0,128),2)
+                
+                cv2.rectangle(frame_draw,(52,r_s + int(r_ln*t_elpsd_p)),(78,r_e),(0,140,255),-1)
+                
+                if self.lock_iter== self.max_wait:
+                    self.invoke_screenlock = False
+                    ctypes.windll.user32.LockWorkStation()
+
             
             cv2.imshow('Video', frame_draw)
             # Hit 'Esc' on the keyboard to quit!
