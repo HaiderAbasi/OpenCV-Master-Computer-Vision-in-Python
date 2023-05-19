@@ -2,6 +2,12 @@
 .vscode/
 .idea/
 
+#Binaries
+*.t7
+*.pt
+src/c__Advanced/Object_tracking/c_deepsort/deep_sort/deep/checkpoint/ckpt.t7
+*.yaml
+
 # Vagrant
 .vagrant/
 

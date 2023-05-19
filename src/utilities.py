@@ -7,6 +7,79 @@ import sys
 import time
 import os
 from collections import deque
+import subprocess
+import gdown
+import zipfile
+
+
+def download_missing_recog_data(recog_dir):
+    """Download missing model files from Google Drive."""
+    models_dir = os.path.join(recog_dir, 'recog_data', 'models')
+    model_files = ['lbfmodel.yaml']  # replace with actual file names
+    
+    files_id = ['1gipWgZMM14ZlHjvhFSli2fqwwGyYZiyN']  # replace with actual file IDs or URLs
+    
+    # Create model directory if it doesnot exist
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+    
+    for i, file in enumerate(model_files):
+        file_path = os.path.join(models_dir, file)
+        if not os.path.exists(file_path):
+            print(f'{file} not found. Downloading...')
+            file_id = files_id[i]  # replace with the actual file ID or URL
+            if file_id.startswith('http'):
+                # Use curl to download the file
+                subprocess.run(['curl', '-L', file_id, '-o', file_path], check=True)
+            else:
+                # Use gdown to download the file from Google Drive
+                url = f'https://drive.google.com/uc?id={file_id}'
+                gdown.download(url, file_path, quiet=False)
+            print(f'{file} downloaded successfully!')
+
+
+def download_missing_training_data(recog_dir,verbose=0):
+    """Download missing model files from Google Drive."""
+    models_dir = os.path.join(recog_dir, 'recog_data')
+    model_files = ['training.zip']  # replace with actual file names
+    files_id = ['1IsEjCloWgBKNp0GxpbXj9q9L2_6eXuxW']  # replace with actual file IDs or URLs
+    
+    # Create model directory if it doesnot exist
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+    
+    for i, file in enumerate(model_files):
+        file_path = os.path.join(models_dir, file)
+        if not os.path.exists(file_path):
+            print(f'{file} not found. Downloading...')
+            file_id = files_id[i]  # replace with the actual file ID or URL
+            # Use gdown to download the file from Google Drive
+            url = f'https://drive.google.com/uc?id={file_id}'
+            gdown.download(url, file_path, quiet=False)
+            if verbose:
+                print(f'{file} downloaded successfully!')
+            # Extract the downloaded zip file
+            with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                zip_ref.extractall(models_dir)
+            if verbose:
+                print(f'{file} extracted successfully!')
+            # Delete the zip file after extraction
+            os.remove(file_path)
+            if verbose:
+                print(f'{file} deleted successfully!')
+
+
+use_optional = False
+
+
+if use_optional:
+    try:
+        from sklearn.cluster import KMeans
+        from skimage.feature import local_binary_pattern
+        print("Importing kmeans for unsupervised data sorting...")
+    except ImportError:
+        print("sklearn not installed!")
+
 
 logger.remove()
 logger.add(sink = sys.stderr, level="INFO")
@@ -99,15 +172,15 @@ def imshow(img_name,img,image_shape = None,Window_flag = cv2.WINDOW_AUTOSIZE,bou
     cv2.imshow(img_name,img_disp)    
 
 def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(0, 255, 0),thickness=1,color_bg=(0, 0, 0),bbox_size = None):
-    FONT_SCALE = 2e-3  # Adjust for larger font size in all images
+    FONT_SCALE = 3e-3  # Adjust for larger font size in all images
     THICKNESS_SCALE = 2e-3  # Adjust for larger thickness in all images
 
     if fontScale==1:
         if bbox_size == None:
             height, width= img.shape[:2]
         else:
-            FONT_SCALE = 3e-2
-            THICKNESS_SCALE = 2e-2
+            FONT_SCALE = 1e-2
+            THICKNESS_SCALE = 2e-3
             width,height = bbox_size
         fontScale = min(width, height) * FONT_SCALE
         thickness = math.ceil(min(width, height) * THICKNESS_SCALE)
@@ -367,6 +440,12 @@ def get_rois_mask(img_smarties):
     
     return change_mask
 
+def get_centroids(bboxes):
+    centers = []
+    for bbox in bboxes:
+        centers.append(find_centroid(bbox,"ltwh"))
+    return centers
+
 def get_centroid(cnt):
     M = cv2.moments(cnt)
     if M['m00']==0: # If its a line (No Area) then use minEnclosingcircle and use its center as the centroid
@@ -386,15 +465,6 @@ def closest_node(node, nodes):
 def euc_dist(a,b):
     return math.sqrt( ( (a[1]-b[1])**2 ) + ( (a[0]-b[0])**2 ) )
 
-# def bwareaopen(image):
-#     imglab = morphology.label(image) # create labels in segmented image
-#     cleaned = morphology.remove_small_objects(imglab, min_size=64, connectivity=2)
-
-#     smallies_removed = np.zeros((cleaned.shape)) # create array of size cleaned
-#     smallies_removed[cleaned > 0] = 255 
-#     smallies_removed= np.uint8(smallies_removed)
-    
-#     return smallies_removed
 
 def keep_blobs_by_mask(img,mask):
     # Algo: 
@@ -1054,12 +1124,12 @@ def generate_vibrant_color():
     vibrant_clr = hsv_to_rgb(h,s,v)
     return vibrant_clr
 
-def find_centroid(bbox,bbox_type = "ltrd"):
+def find_centroid(bbox, bbox_type="ltrd"):
     """
-    This function computes the centroid of a bounding box given its coordinates in ltrd format.
+    This function computes the centroid of a bounding box given its coordinates in ltrd or ltwh format.
 
     Parameters:
-    bbox (tuple): A tuple of 4 values (x1, y1, x2, y2) that define the bounding box coordinates.
+    bbox (tuple): A tuple of 4 values (x1, y1, x2, y2) or 3 values (x, y, w, h) that define the bounding box coordinates.
     bbox_type (str, optional): The type of bounding box, default is "ltrd".
 
     Returns:
@@ -1068,14 +1138,18 @@ def find_centroid(bbox,bbox_type = "ltrd"):
     Raises:
     ValueError: If an unsupported bounding box type is provided.
     """
-    if (bbox_type == "ltrd"):
+    if bbox_type == "ltrd":
         x1, y1, x2, y2 = bbox
         x_center = (x1 + x2) / 2
         y_center = (y1 + y2) / 2
         return (int(x_center), int(y_center))
+    elif bbox_type == "ltwh":
+        x, y, w, h = bbox
+        x_center = x + w / 2
+        y_center = y + h / 2
+        return (int(x_center), int(y_center))
     else:
-        print("[Unsupported bbox_type]: Please provide a 'ltrd' bbox!")
-        return (0,0)
+        raise ValueError("[Unsupported bbox_type]: Please provide an 'ltrd' or 'ltwh' bbox!")
 
 def closest_bbox_to_pt(point, bboxes):
     """
@@ -1122,7 +1196,171 @@ def add_to_dict_deque(d, key, value,dq_len = 2):
         # if not, create a new deque with length 2 and store it in the dictionary
         d[key] = deque([value], maxlen=dq_len)
 
+class dataextractor:
+    
+    def __init__(self):
+        self.recognizer = cv2.face.LBPHFaceRecognizer_create()
+        self.img_sz = 100
+        
+        self.debug = False
+        
+        self.save_dir = None
+    
 
+    def extract_data(self,vid_path, data_to_extract = "faces", save_dir = "",skip_frames = 5):
+        
+        filename = os.path.basename(vid_path)
+        # Check if file format is supported by OpenCV
+        ext = filename.split('.')[-1]
+        if ext not in ['avi', 'mp4', 'mov', 'mkv','webp']:
+            print(f"{filename} is not a supported video format.")
+            return
+        
+        if data_to_extract != "faces":
+            print("Error!\nFor the moment function only works for extracting faces...Returning\n")
+            return
+        
+        if save_dir == "":
+            save_dir = data_to_extract
+
+        # create a directory to store extracted faces
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+            
+        print(f"save_dir = {save_dir}")
+        
+        self.save_dir = save_dir
+        
+        # load face detection model
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+
+        # open video file
+        cap = cv2.VideoCapture(vid_path)
+
+        curr_iter = 9
+        face_iter = 1
+        # loop over frames in the video
+        while True:
+            curr_iter +=1
+            if curr_iter%skip_frames == 0:
+                # read a frame from the video
+                ret, frame = cap.read()
+                if not ret:
+                    break
+
+                # convert the frame to grayscale
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+                # detect faces in the grayscale image
+                faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+
+                # loop over the faces and save them to disk
+                for i, (x, y, w, h) in enumerate(faces):
+                    img_path = os.path.join(save_dir, f"face_{face_iter}.jpg")
+                    print(f"Saving to = {img_path}")
+                    # extract the face region from the frame
+                    face = gray[y:y+h, x:x+w]
+                    face = cv2.resize(face,(self.img_sz,self.img_sz))
+                    # save the face image to disk
+                    cv2.imwrite(img_path, face)
+                    face_iter+=1
+                    if self.debug:
+                        cv2.imshow("face",face)
+                        cv2.waitKey(1)
+
+        # release the video capture object and close all windows
+        cap.release()
+        cv2.destroyAllWindows()
+
+    @staticmethod
+    def preprocess(img):
+        return img
+    
+    def isort(self,data_dir):
+        labels = []
+        features = []
+        face_images = []
+        # Step 1: Load the images and preprocess them
+        for filename in os.listdir(data_dir):
+            img = cv2.imread(os.path.join(data_dir, filename),cv2.IMREAD_UNCHANGED)
+            # Apply face detection and alignment or facial landmark detection
+            # to preprocess the images and extract the faces
+            face_images.append(self.preprocess(img))
+            
+            # Step 2: Extract features using LBPH recognizer
+            # Extract LBP features using skimage's local_binary_pattern function
+            radius = 3
+            n_points = 8 * radius
+            lbp = local_binary_pattern(img, n_points, radius)
+            # Flatten the LBP features into a 1D array and append to the list of features
+            features.append(lbp.flatten())
+
+        # Step 3: Apply KMeans clustering to group similar faces together
+        n_clusters = 8  # number of clusters
+        kmeans = KMeans(n_clusters=n_clusters, random_state=0)
+        clusters = kmeans.fit_predict(features)
+
+        # Step 4: Save the results
+        for i in range(n_clusters):
+            cluster_dir = os.path.join(data_dir, 'cluster_{}'.format(i))
+            os.makedirs(cluster_dir, exist_ok=True)
+            cluster_indices = np.where(clusters == i)[0]
+            counter = 1  # initialize counter
+            for idx in cluster_indices:
+                filename = 'person{}_img{}.jpg'.format(i, counter)
+                img = face_images[idx]
+                cv2.imwrite(os.path.join(cluster_dir, filename), img)
+                counter+=1
+        for filename in os.listdir(self.save_dir):
+            file_path = os.path.join(self.save_dir, filename)
+            if os.path.isfile(file_path):
+                # Check if file format is supported by OpenCV
+                ext = filename.split('.')[-1]
+                if ext not in ['jpg', 'jpeg', 'png']:
+                    print(f"{filename} is not a supported video format.")
+                    return
+                print(f"Deleting {filename}.....")
+                os.remove(file_path)
+
+    def extract(self,vid_path, data_to_extract = "faces", save_dir = "",skip_frames = 5,use_isort = False):
+        
+        # Return if save_directory exists and is filled with directoires of already sorted data.
+        if os.path.isdir(save_dir) and len([f.path for f in os.scandir(save_dir) if f.is_dir()])>0:
+            print("\n(Data Already Sorted!) Returning....\n")
+            return
+        
+        self.extract_data(vid_path,data_to_extract,save_dir,skip_frames)
+        
+        if use_isort:
+            if not use_optional:
+                print("\n [Warning: -Isort disabled-] Set (use_optional -> True) in py to enable isort usage")
+                return
+            self.isort(save_dir)
 # DeepSort Additions 
 
+def draw_border(img, pt1, pt2, color, thickness, r, d):
+    # https://stackoverflow.com/questions/50548556/python-opencvhow-to-draw-not-complete-rectangle-with-four-corners-on-image
+    # https://stackoverflow.com/questions/46036477/drawing-fancy-rectangle-around-face
+    x1,y1 = pt1
+    x2,y2 = pt2
+
+    # Top left
+    cv2.line(img, (x1 + r, y1), (x1 + r + d, y1), color, thickness)
+    cv2.line(img, (x1, y1 + r), (x1, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y1 + r), (r, r), 180, 0, 90, color, thickness)
+
+    # Top right
+    cv2.line(img, (x2 - r, y1), (x2 - r - d, y1), color, thickness)
+    cv2.line(img, (x2, y1 + r), (x2, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y1 + r), (r, r), 270, 0, 90, color, thickness)
+
+    # Bottom left
+    cv2.line(img, (x1 + r, y2), (x1 + r + d, y2), color, thickness)
+    cv2.line(img, (x1, y2 - r), (x1, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y2 - r), (r, r), 90, 0, 90, color, thickness)
+
+    # Bottom right
+    cv2.line(img, (x2 - r, y2), (x2 - r - d, y2), color, thickness)
+    cv2.line(img, (x2, y2 - r), (x2, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y2 - r), (r, r), 0, 0, 90, color, thickness)
 # Advanced
