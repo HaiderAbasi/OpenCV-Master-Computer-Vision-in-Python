@@ -4,6 +4,7 @@ import os
 
 from src.b__CV_101.b_image_filtering import assignment
 
+from tests.utils import download_missing_test_data
 
 
 
@@ -66,4 +67,5 @@ class TestImageFiltering(unittest.TestCase):
         
 
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()

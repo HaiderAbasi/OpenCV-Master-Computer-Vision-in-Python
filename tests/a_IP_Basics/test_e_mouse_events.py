@@ -5,6 +5,8 @@ from src.a__IP_Basics.e_mouse_events import assignment
 
 from loguru import logger
 
+from tests.utils import download_missing_test_data
+
 class TestMouseEvents(unittest.TestCase):
         
     def test_trackbar(self):
@@ -34,4 +36,5 @@ class TestMouseEvents(unittest.TestCase):
         self.assertGreater(area,ref_area,msg = "\n\n [Error]:\n\n   >>> Image not upsized! <<< \n")
 
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()

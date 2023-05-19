@@ -5,6 +5,8 @@ import cv2
 from tests.utils import Helper
 from loguru import logger
 
+from tests.utils import download_missing_test_data
+
 class TestTrackbar(unittest.TestCase):
         
     def test_trackbar(self):
@@ -38,4 +40,5 @@ class TestTrackbar(unittest.TestCase):
         self.assertLess(ball_ref_error_perc,1,msg="\n\n [Suggestion]:\n\n   >>> Not blue enough <<< \n")
 
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()
