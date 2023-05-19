@@ -24,8 +24,20 @@ class Cascade_Detector:
             exit(0)
             
     def detect(self,img,display = False):
+        """
+        Detects objects in an input image using the Haar cascade classifier.
         
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        Args:
+            img (numpy.ndarray): Input image.
+            display (bool): Flag to display the detected objects in the input image. Default is False.
+        
+        Returns:
+            numpy.ndarray: List of bounding boxes (x, y, w, h) for detected objects in the input image.
+        """
+        if len(img.shape) == 3 and img.shape[2] ==3:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = img
         
         # scaleFactor: How much image size is reduced at each image scale default : 1.1 (10%)
         # minNeighbors: How many neighbors each candidate rectangle should have to retain it.
@@ -41,7 +53,8 @@ class Cascade_Detector:
                 putText(img,self.category,(x,y-20),bbox_size=(w,h))
                 # Drawing the bbox around the detected object
                 cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),1)
-                
+        
+        return bboxes
 
 def main():
     hc_detector = Cascade_Detector("TrafficLight")

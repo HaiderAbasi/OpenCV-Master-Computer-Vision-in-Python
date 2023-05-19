@@ -3,6 +3,8 @@ from src.a__IP_Basics.b_img_manipulation import assignment
 import numpy as np
 import cv2
 
+from tests.utils import download_missing_test_data
+
 class TestImgManipulation(unittest.TestCase):
         
     def test_imgmanipulation(self):
@@ -33,4 +35,5 @@ class TestImgManipulation(unittest.TestCase):
         
         
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()
