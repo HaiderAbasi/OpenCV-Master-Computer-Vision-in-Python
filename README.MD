@@ -1,6 +1,7 @@
-# OPENCV4-Master-Computer-Vision-in-Python-
+# OPENCV4-Master-Computer-Vision-in-Python
 
 ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/MASTERCV_COVERPHOTO.png)
+
 ## Repository contents
 <details open="open">
   <summary>Table of Contents</summary>
@@ -28,6 +29,7 @@ This course is your ultimate guide to mastering Computer Vision. Learn & impleme
 
 From IP basics to advanced and the final project, We will create everything from scratch. Each topic will be accompanied with an assignment to test your knowledge. Python Object Oriented programming practices will be utilized for better development.
 
+
 ## ⚡ Using this Repository
 ----
 
@@ -44,6 +46,7 @@ From IP basics to advanced and the final project, We will create everything from
 
 ## ⛲ Features
 ---
+
 **Image Processing Basics**               |  **CV-101**
 :-------------------------:|:-------------------------:
 ![alt text](https://media.giphy.com/media/uio7Pa1qM53LktRCeA/giphy-downsized.gif)  |  ![alt text](https://media.giphy.com/media/AIVJRWQxZVP7VQnxZR/giphy-downsized.gif)
@@ -65,6 +68,7 @@ From IP basics to advanced and the final project, We will create everything from
 <img src="https://media.giphy.com/media/wLPssuVyyWLpZpnCWX/giphy-downsized.gif" width="393"> |  <img src="https://media.giphy.com/media/5i8SfIfAnbSMC4hELC/giphy-downsized-large.gif" width="393"> 
 
 
+
 ## 🧊 Pre-Course Requirments:
 ---
 - IDE or Code-Editor (Preferably VsCode)
@@ -79,7 +83,9 @@ From IP basics to advanced and the final project, We will create everything from
 
 ## 💰 Coupon
 ----
- - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=LAUNCH)**
+
+ - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=MASTERCV)**
+
 
 ## 👤 Instructors
 ---

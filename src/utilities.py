@@ -81,6 +81,7 @@ if use_optional:
         print("sklearn not installed!")
 
 
+
 logger.remove()
 logger.add(sink = sys.stderr, level="INFO")
 
@@ -172,7 +173,7 @@ def imshow(img_name,img,image_shape = None,Window_flag = cv2.WINDOW_AUTOSIZE,bou
     cv2.imshow(img_name,img_disp)    
 
 def putText(img, text,org=(0, 0),font=cv2.FONT_HERSHEY_PLAIN,fontScale=1,color=(0, 255, 0),thickness=1,color_bg=(0, 0, 0),bbox_size = None):
-    FONT_SCALE = 3e-3  # Adjust for larger font size in all images
+    FONT_SCALE = 2e-3  # Adjust for larger font size in all images
     THICKNESS_SCALE = 2e-3  # Adjust for larger thickness in all images
 
     if fontScale==1:
@@ -445,6 +446,7 @@ def get_centroids(bboxes):
     for bbox in bboxes:
         centers.append(find_centroid(bbox,"ltwh"))
     return centers
+
 
 def get_centroid(cnt):
     M = cv2.moments(cnt)
@@ -1130,6 +1132,7 @@ def find_centroid(bbox, bbox_type="ltrd"):
 
     Parameters:
     bbox (tuple): A tuple of 4 values (x1, y1, x2, y2) or 3 values (x, y, w, h) that define the bounding box coordinates.
+
     bbox_type (str, optional): The type of bounding box, default is "ltrd".
 
     Returns:
@@ -1138,6 +1141,7 @@ def find_centroid(bbox, bbox_type="ltrd"):
     Raises:
     ValueError: If an unsupported bounding box type is provided.
     """
+
     if bbox_type == "ltrd":
         x1, y1, x2, y2 = bbox
         x_center = (x1 + x2) / 2
@@ -1150,6 +1154,7 @@ def find_centroid(bbox, bbox_type="ltrd"):
         return (int(x_center), int(y_center))
     else:
         raise ValueError("[Unsupported bbox_type]: Please provide an 'ltrd' or 'ltwh' bbox!")
+
 
 def closest_bbox_to_pt(point, bboxes):
     """

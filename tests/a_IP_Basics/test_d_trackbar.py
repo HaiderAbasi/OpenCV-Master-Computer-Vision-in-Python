@@ -7,6 +7,7 @@ from loguru import logger
 
 from tests.utils import download_missing_test_data
 
+
 class TestTrackbar(unittest.TestCase):
         
     def test_trackbar(self):
@@ -42,3 +43,4 @@ class TestTrackbar(unittest.TestCase):
 if __name__ == "__main__":
     download_missing_test_data()
     unittest.main()
+    
