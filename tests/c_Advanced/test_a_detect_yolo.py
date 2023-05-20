@@ -10,6 +10,7 @@ from src.utilities import get_iou,to_ltrd,download_missing_recog_data
 
 
 
+
 class TestDetectYolo(unittest.TestCase):
         
     def test_detectyolo(self):
@@ -98,3 +99,4 @@ class TestDetectYolo(unittest.TestCase):
 if __name__ == "__main__":
     download_missing_recog_data()
     unittest.main()
+    
