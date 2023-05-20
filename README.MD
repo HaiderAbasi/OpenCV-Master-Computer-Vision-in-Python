@@ -50,19 +50,19 @@ From IP basics to advanced and the final project, We will create everything from
 
 **Feature**               |  **Matching**
 :-------------------------:|:-------------------------:
-<img src="https://media.giphy.com/media/DfqulTWhEnk4oD5A9U/giphy-downsized.gif" width="350"> |  <img src="https://media.giphy.com/media/29RhdtNRvWgKVILWi9/giphy-downsized.gif" width="350">
+<img src="https://media.giphy.com/media/DfqulTWhEnk4oD5A9U/giphy-downsized.gif" width="380"> |  <img src="https://media.giphy.com/media/29RhdtNRvWgKVILWi9/giphy-downsized.gif" width="380">
 
 **Haar-Cascades**               |  **YOLO**
 :-------------------------:|:-------------------------:
-<img src="https://media.giphy.com/media/W0QziFM8KjV2wBtzHn/giphy-downsized.gif" width="350"> |  <img src="https://media.giphy.com/media/tgdPWzXNngDyn0RGrN/giphy-downsized.gif" width="350">
+<img src="https://media.giphy.com/media/W0QziFM8KjV2wBtzHn/giphy-downsized.gif" width="380"> |  <img src="https://media.giphy.com/media/tgdPWzXNngDyn0RGrN/giphy-downsized.gif" width="380">
  
 **SOT**               |  **DeepSORT**
 :-------------------------:|:-------------------------:
-<img src="https://media.giphy.com/media/VnOSe7ho2SnWJfGVSJ/giphy-downsized.gif" width="350"> |  <img src="https://media.giphy.com/media/2gLKEDSvSWsNtPuyRD/giphy-downsized.gif" width="350"> 
+<img src="https://media.giphy.com/media/VnOSe7ho2SnWJfGVSJ/giphy-downsized.gif" width="380"> |  <img src="https://media.giphy.com/media/2gLKEDSvSWsNtPuyRD/giphy-downsized.gif" width="380"> 
 
 **Face Recognition**               |  **Secure Access**
 :-------------------------:|:-------------------------:
-<img src="https://media.giphy.com/media/wLPssuVyyWLpZpnCWX/giphy-downsized.gif" width="350"> |  <img src="https://media.giphy.com/media/5i8SfIfAnbSMC4hELC/giphy-downsized-large.gif" width="350"> 
+<img src="https://media.giphy.com/media/wLPssuVyyWLpZpnCWX/giphy-downsized.gif" width="380"> |  <img src="https://media.giphy.com/media/5i8SfIfAnbSMC4hELC/giphy-downsized-large.gif" width="380"> 
 
 
 ## 🧊 Pre-Course Requirments:
