@@ -6,7 +6,7 @@ from src.b__CV_101.e_Image_features import find_obj_inscene
 
 import numpy as np
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 class TestImageTransformations(unittest.TestCase):

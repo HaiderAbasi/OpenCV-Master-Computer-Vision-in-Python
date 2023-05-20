@@ -3,7 +3,7 @@ from src.a__IP_Basics.b_img_manipulation import assignment
 import numpy as np
 import cv2
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 class TestImgManipulation(unittest.TestCase):

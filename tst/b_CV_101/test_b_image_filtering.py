@@ -4,7 +4,7 @@ import os
 
 from src.b__CV_101.b_image_filtering import assignment
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 

@@ -4,7 +4,7 @@ import numpy as np
 
 from src.b__CV_101.c_image_segmentation import assignment
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 class TestImageSegmentation(unittest.TestCase):

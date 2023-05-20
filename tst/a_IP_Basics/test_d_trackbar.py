@@ -2,10 +2,9 @@ import unittest
 from src.a__IP_Basics.d_trackbar import assignment
 import cv2
 
-from tests.utils import Helper
 from loguru import logger
 
-from tests.utils import download_missing_test_data
+from tst.utils import Helper,download_missing_test_data
 
 
 class TestTrackbar(unittest.TestCase):
