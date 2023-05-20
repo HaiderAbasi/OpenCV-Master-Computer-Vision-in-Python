@@ -5,6 +5,7 @@ from src.utilities import closest_node,euc_dist
 from tests.utils import download_missing_test_data
 
 
+
 class TestImageContours(unittest.TestCase):
         
     def test_imagecontours(self):
@@ -38,3 +39,4 @@ class TestImageContours(unittest.TestCase):
 if __name__ == "__main__":
     download_missing_test_data()
     unittest.main()
+    
