@@ -5,7 +5,7 @@ from src.a__IP_Basics.e_mouse_events import assignment
 
 from loguru import logger
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 class TestMouseEvents(unittest.TestCase):

@@ -1,5 +1,7 @@
 # Editors
-.vscode/
+.vscode/__init__.pyi
+.vscode/extensions.json
+.vscode/tasks.json
 .idea/
 
 #Binaries

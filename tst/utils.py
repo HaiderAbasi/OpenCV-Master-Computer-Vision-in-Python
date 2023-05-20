@@ -5,7 +5,7 @@ import zipfile
 
 def download_missing_test_data(verbose = 0):
     """Download missing model files from Google Drive."""
-    models_dir = os.path.join(os.getcwd(), 'tests')
+    models_dir = os.path.join(os.getcwd(), 'tst')
     model_files = ['fixtures.zip']  # replace with actual file names
     files_id = ['1GPqcSG3CKuP90Ed36Gv8DLhl1q4VVrVo']  # replace with actual file IDs or URLs
     

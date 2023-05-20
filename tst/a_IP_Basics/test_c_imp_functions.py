@@ -6,7 +6,7 @@ from src.b__CV_101.e_Image_features import find_obj_inscene
 
 from loguru import logger
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 class TestImpFunctions(unittest.TestCase):

@@ -2,7 +2,7 @@ import unittest
 from src.b__CV_101.d_image_contours import assignment
 from src.utilities import closest_node,euc_dist
 
-from tests.utils import download_missing_test_data
+from tst.utils import download_missing_test_data
 
 
 
