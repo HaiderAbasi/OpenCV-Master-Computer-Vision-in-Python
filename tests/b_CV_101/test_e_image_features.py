@@ -1,7 +1,11 @@
 import unittest
-from src.b__CV_101.e_Image_features import assignment,find_obj_inscene
 import cv2
 import numpy as np
+
+from src.b__CV_101.e_Image_features import assignment,find_obj_inscene
+
+from tests.utils import download_missing_test_data
+
 
 class TestImageFeatures(unittest.TestCase):
         
@@ -35,4 +39,6 @@ class TestImageFeatures(unittest.TestCase):
     
     
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()
+    

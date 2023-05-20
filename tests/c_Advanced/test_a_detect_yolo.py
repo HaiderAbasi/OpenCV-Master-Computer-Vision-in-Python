@@ -6,7 +6,8 @@ from loguru import logger
 
 
 from src.c__Advanced.Object_detection.b_Yolo.a_detect_yolo import Dnn
-from src.utilities import get_iou,to_ltrd
+from src.utilities import get_iou,to_ltrd,download_missing_recog_data
+
 
 
 
@@ -96,4 +97,6 @@ class TestDetectYolo(unittest.TestCase):
         self.assertGreater(detection_accuracy,0.6,msg = "\n\n [Error]:\n\n   >>> Model either incorrectly/incompletely trained <<< \n")
         
 if __name__ == "__main__":
+    download_missing_recog_data()
     unittest.main()
+    

@@ -1,7 +1,11 @@
 import unittest
-from src.b__CV_101.c_image_segmentation import assignment
 import cv2
 import numpy as np
+
+from src.b__CV_101.c_image_segmentation import assignment
+
+from tests.utils import download_missing_test_data
+
 
 class TestImageSegmentation(unittest.TestCase):
         
@@ -23,4 +27,5 @@ class TestImageSegmentation(unittest.TestCase):
         
 
 if __name__ == "__main__":
+    download_missing_test_data()
     unittest.main()

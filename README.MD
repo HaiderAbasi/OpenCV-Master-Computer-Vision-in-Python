@@ -1,5 +1,6 @@
-# Ultimate Computer Vision Course in Python With AI/DeepLearning and OpenCV4
+# OPENCV4-Master-Computer-Vision-in-Python
 
+![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/MASTERCV_COVERPHOTO.png)
 
 ## Repository contents
 <details open="open">
@@ -19,26 +20,12 @@
 ## 🤝Repository's About
 ---
 
-Jump Start your CV-Career with,
-
- &nbsp;&nbsp;👍 &nbsp; Complete Computer Vision tools Roundup<br/>
- &nbsp;&nbsp;👍 &nbsp; Work on DeepLearning Frameworks i.e (Darknet, Pytorch)<br/>
- &nbsp;&nbsp;👍 &nbsp; 10 Coding Assignments<br/>
- &nbsp;&nbsp;👍 &nbsp; Unit tests for Evaluation<br/>
- &nbsp;&nbsp;👍 &nbsp; 1 Final Project End-to-End (Secure Access)<br/>
- &nbsp;&nbsp;👍 &nbsp; 3 Upcoming Projects<br/>
-
-This course is your ultimate guide to mastering Computer Vision from scratch. Learn & implement everything from basics to advanced using OpenCV4, Dlib and AI/DeepLearning. 
-
-
-![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/cover.png)
-
-It is structured with below main headings.
-- Computer Vision Fundamentals 
+This course is your ultimate guide to mastering Computer Vision. Learn & implement everything from basics to advanced using OpenCV4, Dlib and DeepLearning. It is structured with below main headings.
+- Computer Vision Fundamentals
 - Image Processing Basics
 - CV-101 
 - Advanced CV 
-- Project: Secure Access
+- Project: Secure Access - Coming 20th Dec 22-
 
 From IP basics to advanced and the final project, We will create everything from scratch. Each topic will be accompanied with an assignment to test your knowledge. Python Object Oriented programming practices will be utilized for better development.
 
@@ -59,31 +46,27 @@ From IP basics to advanced and the final project, We will create everything from
 
 ## ⛲ Features
 ---
-* **Image Processing Basics**<br/><br/>
-  - ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/IP_Basics.gif)<br/><br/>
-* **CV-101**<br/><br/>
-  - ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_A.gif)<br/><br/>
-* **Feature Matching**<br/><br/>
-  - **Keypoints**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Features.gif)<br/><br/>
-  - **Matching**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/CV_101_Feature_Matching.gif)<br/><br/>
-* **Object Detection**<br/><br/>
-  - **Haar Cascade**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_HC.gif)<br/><br/>
-  - **YOLO**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_det_Yolo.gif)<br/><br/>
-* **Object Tracking**<br/><br/>
-  - **SOT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_single.gif)<br/><br/>
-  - **MOT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_multi.gif)<br/><br/>
-  - **DeepSORT**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Obj_Tracking_DeepSort.gif)<br/><br/>
-* **Face Recognition**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/Face_Recognition.gif)<br/><br/>
-* **Secure Access**<br/><br/>
-&emsp; &emsp; &emsp; &emsp; ![alt text](https://github.com/HaiderAbasi/OPENCV4-Master-Computer-Vision-in-Python-/blob/Live/res/main/coming_soon.jpg)<br/><br/>
+
+**Image Processing Basics**               |  **CV-101**
+:-------------------------:|:-------------------------:
+![alt text](https://media.giphy.com/media/uio7Pa1qM53LktRCeA/giphy-downsized.gif)  |  ![alt text](https://media.giphy.com/media/AIVJRWQxZVP7VQnxZR/giphy-downsized.gif)
+
+**Feature**               |  **Matching**
+:-------------------------:|:-------------------------:
+<img src="https://media.giphy.com/media/DfqulTWhEnk4oD5A9U/giphy-downsized.gif" width="393"> |  <img src="https://media.giphy.com/media/29RhdtNRvWgKVILWi9/giphy-downsized.gif" width="393">
+
+**Haar-Cascades**               |  **YOLO**
+:-------------------------:|:-------------------------:
+<img src="https://media.giphy.com/media/W0QziFM8KjV2wBtzHn/giphy-downsized.gif" width="393"> |  <img src="https://media.giphy.com/media/tgdPWzXNngDyn0RGrN/giphy-downsized.gif" width="393">
+ 
+**SOT**               |  **DeepSORT**
+:-------------------------:|:-------------------------:
+<img src="https://media.giphy.com/media/VnOSe7ho2SnWJfGVSJ/giphy-downsized.gif" width="393"> |  <img src="https://media.giphy.com/media/2gLKEDSvSWsNtPuyRD/giphy-downsized.gif" width="393"> 
+
+**Face Recognition**               |  **Secure Access**
+:-------------------------:|:-------------------------:
+<img src="https://media.giphy.com/media/wLPssuVyyWLpZpnCWX/giphy-downsized.gif" width="393"> |  <img src="https://media.giphy.com/media/5i8SfIfAnbSMC4hELC/giphy-downsized-large.gif" width="393"> 
+
 
 
 ## 🧊 Pre-Course Requirments:
@@ -100,7 +83,9 @@ From IP basics to advanced and the final project, We will create everything from
 
 ## 💰 Coupon
 ----
- - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=MASTERCLASS)**
+
+ - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=MASTERCV)**
+
 
 ## 👤 Instructors
 ---
