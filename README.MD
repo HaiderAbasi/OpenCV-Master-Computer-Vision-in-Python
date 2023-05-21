@@ -25,7 +25,7 @@ This course is your ultimate guide to mastering Computer Vision. Learn & impleme
 - Image Processing Basics
 - CV-101 
 - Advanced CV 
-- Project: Secure Access - Coming 20th Dec 22-
+- Project: Secure Access
 
 From IP basics to advanced and the final project, We will create everything from scratch. Each topic will be accompanied with an assignment to test your knowledge. Python Object Oriented programming practices will be utilized for better development.
 
