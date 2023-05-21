@@ -12,7 +12,7 @@ class TestImgManipulation(unittest.TestCase):
         print('''\n[Testing]: Checking if solar eclipse has been correctly visualized or not!\n''')
 
         # Create your inputs
-        eclipse = cv2.imread("tests/fixtures/eclipse.png")
+        eclipse = cv2.imread("tst/fixtures/eclipse.png")
         
         result = assignment(debug= False)
         

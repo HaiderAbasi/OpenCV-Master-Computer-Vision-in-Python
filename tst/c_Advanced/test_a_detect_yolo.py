@@ -6,7 +6,8 @@ from loguru import logger
 
 
 from src.c__Advanced.Object_detection.b_Yolo.a_detect_yolo import Dnn
-from src.utilities import get_iou,to_ltrd,download_missing_recog_data
+from src.utilities import get_iou,to_ltrd
+from tst.utils import download_missing_test_data
 
 
 
@@ -52,7 +53,7 @@ class TestDetectYolo(unittest.TestCase):
         
         # Fetch image paths from directory
         exts = ['*.png', '*.jpg']
-        image_list = [f for ext in exts for f in glob.glob(os.path.join("tests/fixtures/advanced/yolo", ext))]
+        image_list = [f for ext in exts for f in glob.glob(os.path.join("tst/fixtures/advanced/yolo", ext))]
              
         # Contatining for identifying the correct predictions by idx
         pred_matched = [0] * len(image_list)
@@ -97,6 +98,6 @@ class TestDetectYolo(unittest.TestCase):
         self.assertGreater(detection_accuracy,0.6,msg = "\n\n [Error]:\n\n   >>> Model either incorrectly/incompletely trained <<< \n")
         
 if __name__ == "__main__":
-    download_missing_recog_data()
+    download_missing_test_data()
     unittest.main()
     

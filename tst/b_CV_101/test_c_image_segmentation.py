@@ -13,7 +13,7 @@ class TestImageSegmentation(unittest.TestCase):
         print('''\n[Testing]: Checking if Segmentation assignment was completed correctly..\n''')
         
         # Create your inputs
-        ref_img = cv2.imread(r"tests\fixtures\segmented_plants.png",cv2.IMREAD_UNCHANGED)
+        ref_img = cv2.imread(r"tst\fixtures\segmented_plants.png",cv2.IMREAD_UNCHANGED)
         ref_mask = ref_img[:,:,3]
 
         result = assignment(debug = False)

@@ -50,7 +50,8 @@ def download_missing_training_data(recog_dir,verbose=0):
     
     for i, file in enumerate(model_files):
         file_path = os.path.join(models_dir, file)
-        if not os.path.exists(file_path):
+        train_path = os.path.join(models_dir, "training")
+        if not os.path.exists(train_path):
             print(f'{file} not found. Downloading...')
             file_id = files_id[i]  # replace with the actual file ID or URL
             # Use gdown to download the file from Google Drive

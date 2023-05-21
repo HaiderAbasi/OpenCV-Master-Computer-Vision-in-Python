@@ -12,10 +12,10 @@ class TestMouseEvents(unittest.TestCase):
         
     def test_trackbar(self):
         print('''\n[Testing]: Return the (Upscaled)-Second image by navigating and resizing inside the Image Viewer\n''')
-        logger.warning("> Disclaimer: This tests requires user-input. Without which it cannot be carried out!\n")
+        logger.warning("> Disclaimer: This tst requires user-input. Without which it cannot be carried out!\n")
 
         # Create your inputs
-        ref_img = cv2.imread(r"tests\fixtures\me_img_upscaled.png",cv2.IMREAD_UNCHANGED)
+        ref_img = cv2.imread(r"tst\fixtures\me_img_upscaled.png",cv2.IMREAD_UNCHANGED)
 
         result = assignment(debug = False)
 

@@ -11,12 +11,12 @@ class TestTrackbar(unittest.TestCase):
         
     def test_trackbar(self):
         print('''\n[Testing]: Checking if messi-img has been returned with the football turned blue or not!\n''')
-        logger.warning("> Disclaimer: This tests requires user-input. Without which it cannot be carried out!\n")
+        logger.warning("> Disclaimer: This tst requires user-input. Without which it cannot be carried out!\n")
 
         debug = False
         
         # Create your inputs
-        blue_ftball = cv2.imread("tests/fixtures/messi_bluefootball.png",cv2.IMREAD_UNCHANGED)
+        blue_ftball = cv2.imread("tst/fixtures/messi_bluefootball.png",cv2.IMREAD_UNCHANGED)
         ref_img = blue_ftball[:,:,:3]
         ref_mask = blue_ftball[:,:,3]
         

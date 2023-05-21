@@ -15,7 +15,8 @@ def download_missing_test_data(verbose = 0):
     
     for i, file in enumerate(model_files):
         file_path = os.path.join(models_dir, file)
-        if not os.path.exists(file_path):
+        data_path = os.path.join(models_dir, "fixtures")
+        if not os.path.exists(data_path):
             print(f'{file} not found. Downloading...')
             file_id = files_id[i]  # replace with the actual file ID or URL
             # Use gdown to download the file from Google Drive

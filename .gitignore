@@ -3,6 +3,7 @@
 .vscode/extensions.json
 .vscode/tasks.json
 .idea/
+.vs
 
 #Binaries
 *.t7
@@ -34,6 +35,8 @@ Data/
 src/c__Advanced/Tracking/model_data
 src/c__Advanced/Face_Recognition/apps/Secure_Access/models
 src/c__Advanced/Face_Recognition/apps/Secure_Access/authorized_personnels/taha/
+src/c__Advanced/Object_recognition/recog_data/training/
+src/c__Advanced/Object_recognition/recog_data/attendance.csv
 build/
 develop-eggs/
 dist/
@@ -73,6 +76,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+fixtures
 
 # Translations
 *.mo
@@ -137,3 +141,4 @@ venv.bak/
 .dmypy.json
 dmypy.json
 john_doe.csv
+src/b__CV_101/vid_roi_highlighted.avi

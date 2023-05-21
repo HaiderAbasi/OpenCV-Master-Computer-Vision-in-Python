@@ -13,10 +13,10 @@ class TestImpFunctions(unittest.TestCase):
         
     def test_impfunctions(self):
         print('''\n[Testing]: Checking if bottom-left plant has been returned without shadow!\n''')
-        logger.warning("> Disclaimer: This tests requires user-input. Without which it cannot be carried out!\n")
+        logger.warning("> Disclaimer: This tst requires user-input. Without which it cannot be carried out!\n")
 
         # Create your inputs
-        Plant_no_shadow = cv2.imread("tests/fixtures/Plant-no-shadow.png",cv2.IMREAD_UNCHANGED)
+        Plant_no_shadow = cv2.imread("tst/fixtures/Plant-no-shadow.png",cv2.IMREAD_UNCHANGED)
 
         result = assignment(debug=False)
 

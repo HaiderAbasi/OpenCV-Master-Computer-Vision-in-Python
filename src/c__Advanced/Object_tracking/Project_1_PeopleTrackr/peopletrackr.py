@@ -17,7 +17,8 @@ import torch.backends.cudnn as cudnn
 
 import sys
 
-from src.c__Advanced.Object_tracking.c_deepsort.utilities import putText,add_to_dict_deque,find_centroid,Gui,closest_bbox_to_pt
+from utilities import putText,add_to_dict_deque,find_centroid,Gui,closest_bbox_to_pt
+from utilities import download_missing_model_files,download_missing_yolo_model_files
 
 deepsort_dir = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.join(deepsort_dir, 'yolov5')))
@@ -28,6 +29,10 @@ cudnn.benchmark = True
 
 class VideoTracker(object):
     def __init__(self, args):
+        # Download missing models
+        download_missing_model_files(deepsort_dir)
+        download_missing_yolo_model_files(deepsort_dir)
+        
         print('Initialize DeepSORT & YOLO-V5')
         # ***************** Initialize ******************************************************
         self.args = args

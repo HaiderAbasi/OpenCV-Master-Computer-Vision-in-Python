@@ -15,7 +15,7 @@ class TestImageTransformations(unittest.TestCase):
         print('''\n[Testing]: Return the Upscaled second image by navigating and resizing inside the Image Viewer''')
         
         # Create your inputs
-        ref_img = cv2.imread(r"tests\fixtures\bookcover.png",cv2.IMREAD_UNCHANGED)
+        ref_img = cv2.imread(r"tst\fixtures\bookcover.png",cv2.IMREAD_UNCHANGED)
 
         result = assignment(debug = False)
         

@@ -14,3 +14,5 @@ tomlkit==0.11.4
 typing_extensions==4.3.0
 wrapt==1.14.1
 loguru
+gdown
+pandas

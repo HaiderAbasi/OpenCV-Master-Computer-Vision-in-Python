@@ -16,8 +16,8 @@ class TestImageFiltering(unittest.TestCase):
         print('''\n[Testing]: Checking Meteor (ROI) was properly highlighted in the test-video''')
         
         # Create your inputs
-        ref_vid = cv2.VideoCapture(r"tests\fixtures\meteor_mini.mp4")
-        ref_crop = cv2.imread(r"tests\fixtures\meteor_caught.png",cv2.IMREAD_UNCHANGED)
+        ref_vid = cv2.VideoCapture(r"tst\fixtures\meteor_mini.mp4")
+        ref_crop = cv2.imread(r"tst\fixtures\meteor_caught.png",cv2.IMREAD_UNCHANGED)
         
         ref_crop_img = ref_crop[:,:,:3]
         ref_crop_mask = ref_crop[:,:,3]

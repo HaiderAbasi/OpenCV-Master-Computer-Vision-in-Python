@@ -14,9 +14,9 @@ class TestImageFeatures(unittest.TestCase):
         print('''[Testing]: Testing if img-registration (assignment) is working as required or not!\n''')
         
         # Create your inputs
-        ref_transformed = cv2.imread(r"tests\fixtures\drone_view_transformed.png",cv2.IMREAD_UNCHANGED)
+        ref_transformed = cv2.imread(r"tst\fixtures\drone_view_transformed.png",cv2.IMREAD_UNCHANGED)
         
-        ref_scene = cv2.imread(r"tests\fixtures\scene_obj_removed.png",cv2.IMREAD_UNCHANGED)
+        ref_scene = cv2.imread(r"tst\fixtures\scene_obj_removed.png",cv2.IMREAD_UNCHANGED)
         ref_scene_roi = ref_scene[:,:,:3]
         ref_scene_mask = ref_scene[:,:,3]
 
