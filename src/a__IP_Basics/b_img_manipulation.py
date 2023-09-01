@@ -94,16 +94,16 @@ def main():
     # Task : Pixel-Wises Manipulation Manipulation
     print_h("2: Pixel-Wise Image Manipulation")
     
-    # 0: Identity image creation using numpy
+    # 1: Identity image creation using numpy
     img_eyes = np.eye(10,dtype=np.uint8)*255
     images.append(img_eyes)
     titles.append("img_eyes")
     
-    # 1: Checking pixel value
+    # 2: Checking pixel value
     data = img_eyes[5,5]
     print("data = ",data)
     
-    # 2: Changing pixel value
+    # 3: Changing pixel value
     img_eyes_pix_acces = img_eyes.copy()
     img_eyes_pix_acces[5,5] = 0
     images.append(img_eyes_pix_acces)

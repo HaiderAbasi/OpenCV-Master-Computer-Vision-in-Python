@@ -55,9 +55,14 @@ def assignment(debug = True):
                 ''')
     #Input
     global total_images,curr_img,windowSize
-    
+    # List of image file extensions to include
+    image_extensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff']
+
+    # Generate a list of file paths for images with the specified extensions
+    image_list = []
+    for ext in image_extensions:
+        image_list.extend(glob.glob(f"Data/*.{ext}"))
     # Fetch image paths from directory
-    image_list = [filepaths for filepaths in glob.glob("Data/*.png")]
     total_images = len(image_list)
     
     # [Mouse Callback]: a> Create a NamedWindow on which mousecallback will be checked
@@ -128,7 +133,13 @@ def main():
     global total_images,curr_img
     
     # Fetch image paths from directory
-    image_list = [filepaths for filepaths in glob.glob("Data/*.png")]
+    # List of image file extensions to include
+    image_extensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff']
+
+        # Generate a list of file paths for images with the specified extensions
+    image_list = []
+    for ext in image_extensions:
+            image_list.extend(glob.glob(f"Data/*.{ext}"))
     total_images = len(image_list)
     
     # Set default windowsize for picture viewer

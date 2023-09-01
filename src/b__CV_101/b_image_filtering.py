@@ -112,7 +112,7 @@ def denoising(noisy_img):
     images.append(img_guass)
     titles.append(f"filtered (guass {(k_w,k_h)} )")
     
-    #   b) LPF #2: Median filter (Non-linear filter used for denoising (Salt-pepper noise), edge preservation better)
+    #   b) LPF #3: Median filter (Non-linear filter used for denoising (Salt-pepper noise), edge preservation better)
     #                             Slow, because it needs to perform sorting to find the median in the underlying array
     img_median = cv2.medianBlur(noisy_img,ksize)
     images.append(img_median)
@@ -218,7 +218,7 @@ def main():
     cv2.createTrackbar("k_w","Noise Removal",k_w,30,on_k_w_Change)
     cv2.createTrackbar("k_h","Noise Removal",k_h,30,on_k_h_Change)
     cv2.createTrackbar("ksize","Noise Removal",ksize,30,onksizeChange)
-    cv2.createTrackbar("image_no","Noise Removal",image_no,10,on_image_no_Change)
+    cv2.createTrackbar("image_no","Noise Removal",image_no,4,on_image_no_Change)
 
     
     while(1):
