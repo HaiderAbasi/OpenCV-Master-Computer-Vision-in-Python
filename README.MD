@@ -84,7 +84,7 @@ From IP basics to advanced and the final project, We will create everything from
 ## 💰 Coupon
 ----
 
- - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=MASTERCV)**
+ - Udemy Discounted Course Link **[[Discounted Link]](https://www.udemy.com/course/computer-vision-2022-masterclass-with-opencv4-and-python/?couponCode=STARTON)**
 
 
 ## 👤 Instructors
