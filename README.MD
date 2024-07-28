@@ -78,7 +78,7 @@ From IP basics to advanced and the final project, We will create everything from
 
 ## 📗 Notes
 ---
- - Will be uploaded on [**Cvsense**](https://cvsense.com) soon!
+ - [**MasterCV-Notes**](https://drive.google.com/drive/folders/1btKryxhWfi8waHgscTuw3I8gFpk4gz1-?usp=sharing)
 
 
 ## 💰 Coupon
